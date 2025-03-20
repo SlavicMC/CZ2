@@ -1,0 +1,15 @@
+1.  unsigned int wskazuje ilość bajtów dalej przeznaczonych na przyzywane polecenia z dll
+    biblioteki są wyszukiwane w jakimś stałym folderze na komputerze (np. "C:\Program Files (x86)\Cezak\zbiory" albo coś takiego, do ustalenia)
+    polecenia są wskazywane przez: /nazwa_pliku\0nazwa_polecenia1\0nazwa_polecenia2\0nazwa_polecenia3\0
+                                   ↑
+    przed nazwami plików występuje ukośnik aby odróżnić je od nazw poleceń
+
+2.  unsigned int wskazuje ilość zmiennych bezobszarowych dalej
+    zmienne składają się z 4 wartości zadeklarowanych jako uintptr_t następnie 4 unsigned chary wyznaczają długość zapisu zmiennych (w bajtach)
+    (np. 10 2 2 2 1 oznacza że mamy 10 zmiennych których wartości w kolejnym zapisie zajmują 2, 2, 2 i 1 bajtów)
+    zmienna składa się z 4 wartości: pojemność, rozmiar, ród i cechy
+    następnie występuje zawartość której rozmiar jest równy wczytanej wartości rozmiar
+    następnie występują odnośniki cech (zmiennych przypisanych do tej zmiennej), liczba cech wynosi tyle co wczytana wartość cechy a rozmiar odnośnika jest minimalny by pomieścić wszystkie zmienne (czyli np dla 10 zmiennych jest to jeden bajt bo 128 > 10)
+
+3.  unsigned int wskazuje ilość poleceń bezobszarowych oraz 2 unsigned chary wyznaczające bajtowy rozmiar polecenia i wartości
+    

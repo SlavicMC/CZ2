@@ -1,0 +1,73 @@
+// Ładuje polecenia z pliku .dll (dla windows), zwraca TRUE jeśli wszystko się udało
+// ZWOLNIENIE .DLL SPOWODUJE BŁĘDY JEŚLI BĘDZIEMY CHCIELI UŻYĆ POLECEŃ, KOD WYMAGA POPRAWY
+char zaladujPoleceniaZDll(const char* sciezka)
+{
+    // Załadowanie pliku
+    HMODULE hDll = LoadLibrary(sciezka);
+    if (hDll == NULL)
+    {
+        printf("Nie można załadować biblioteki: %s\n", sciezka);
+        return FALSE;
+    }
+
+    // Załadowanie nazw poleceń z tablicy 'nazwyPolecen' która ma znaleźć się w pliku dll
+    char** nazwyWczytywanychPolecen = (char**)GetProcAddress(hDll, "nazwyPolecen");
+    if (!nazwyWczytywanychPolecen)
+    {
+        printf("Nie można znaleźć tablicy nazw funkcji w DLL.\n");
+        FreeLibrary(hDll);
+        return FALSE;
+    }
+
+    // Załadowanie liczby poleceń ze zmiennej 'liczbaPolecen' która ma znaleźć się w pliku
+    int* liczbaWczytywanychPolecen = (int*)GetProcAddress(hDll, "liczbaPolecen");
+    if (!liczbaWczytywanychPolecen)
+    {
+        printf("Nie można znaleźć zmiennej liczbaFunkcji w DLL.\n");
+        FreeLibrary(hDll);
+        return FALSE;
+    }
+
+    int staraLiczba = liczbaPolecen;
+    liczbaPolecen += *liczbaWczytywanychPolecen;
+
+    // Poszerzenie tablicy 'nazwyPolecen' i dodanie do niej wczytywanych wartości
+    if(nazwyPolecen == NULL) nazwyPolecen = (char**)malloc(sizeof(char*) * liczbaPolecen);
+    else nazwyPolecen = (char**)realloc(nazwyPolecen, sizeof(char*) * liczbaPolecen);
+    if(nazwyPolecen == NULL)
+    {
+        printf("Za mało pamięci by wczytać nazwy poleceń.\n");
+        FreeLibrary(hDll);
+        return FALSE;
+    }
+    memcpy(nazwyPolecen + staraLiczba, nazwyWczytywanychPolecen, (*liczbaWczytywanychPolecen) * sizeof(char*));
+
+    // Poszerzenie tablicy 'polecenia'
+    if(polecenia == NULL) polecenia = (Polecenie*)malloc(sizeof(Polecenie) * liczbaPolecen);
+    else polecenia = (Polecenie*)realloc(polecenia, sizeof(Polecenie) * liczbaPolecen);
+    if(polecenia == NULL)
+    {
+        printf("Za mało pamięci by wczytać polecenia.\n");
+        free(nazwyPolecen);
+        FreeLibrary(hDll);
+        return FALSE;
+    }
+
+    // Dodanie wartości do tablicy 'polecenia' po wcześniej wczytanych nazwach
+    for(int i = staraLiczba; i < liczbaPolecen; i++)
+    {
+        polecenia[i] = (Polecenie)GetProcAddress(hDll, nazwyPolecen[i]);
+        if (!polecenia[i])
+        {
+            printf("Nie można znaleźć polecenia %s w DLL.\n", nazwyPolecen[i]);
+            free(nazwyPolecen);
+            free(polecenia);
+            FreeLibrary(hDll);
+            return FALSE;
+        }
+    }
+
+    FreeLibrary(hDll);
+    return TRUE;
+}
+
