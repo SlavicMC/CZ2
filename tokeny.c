@@ -10,7 +10,7 @@ typedef enum {
     TOKEN_IDENTYFIKATOR,
     TOKEN_OPERATOR,
     TOKEN_NAWIAS,
-    TOKEN_BŁĄD,
+    TOKEN_BLAD,
     TOKEN_KONIEC
 } TokenTyp;
 
@@ -65,7 +65,7 @@ Token skaner(const char **wejscie)
         return token;
     }
 
-    token.typ = TOKEN_BŁĄD;
+    token.typ = TOKEN_BLAD;
     token.wartosc[0] = *(*wejscie)++;
     token.wartosc[1] = '\0';
     return token;
@@ -77,7 +77,7 @@ void wypiszToken(Token token) {
         case TOKEN_IDENTYFIKATOR: printf("(IDENTYFIKATOR, %s)\n", token.wartosc); break;
         case TOKEN_OPERATOR: printf("(OPERATOR, %s)\n", token.wartosc); break;
         case TOKEN_NAWIAS: printf("(NAWIAS, %s)\n", token.wartosc); break;
-        case TOKEN_BŁĄD: printf("[BŁĄD] Nieznany znak: %s\n", token.wartosc); break;
+        case TOKEN_BLAD: printf("[BŁĄD] Nieznany znak: %s\n", token.wartosc); break;
         case TOKEN_KONIEC: break;
     }
 }
