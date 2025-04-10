@@ -5,21 +5,9 @@
 #include <ctype.h>
 #include <gmp.h>
 
+#include "dzielone.h"
+
 typedef void (*Polecenie)();
-
-typedef struct
-{
-    size_t rozmiar;                     // liczba bytów używana przez zawartość
-    size_t rod;                         // ród, wskazuje na inną zmienną która jest zmienną rodową lub na siebie jeśli sama nią jest
-    size_t cechy;                       // liczba cech (zmiennych przypisanych do tej zmiennej)
-    size_t pojemnosc;                   // ilość przypisanej pamięci
-} Zmienna;
-
-typedef struct
-{
-    unsigned char rodzaj;               // 0 - nieznany, 1 - słowo zastrzeżone, 2 - zmienna, 3 - działanie
-    void* zawartosc;                    // wskaźnik lub odnośnik do danych
-} Czastka;
 
 
 Zmienna** zmienne;                      // zmienne
@@ -31,8 +19,6 @@ const char hasloCzp[] = { 0x50, 0x49, 0x45, 0x52, 0x57, 0x53, 0x5A, 0x59 }; // "
 char* poczatek = NULL;
 char* koniec = NULL;
 
-char** slowaZastrzezone = {"jesli", "poki"};
-char** dzialania = {"+", "-", "*", "-", "="};
 char** nazwyPolecen = {"tlumacz", "czytaj"};
 int liczbaPolecen = 0;
 Polecenie* polecenia = NULL;
@@ -260,17 +246,17 @@ Zmienna* wczytujJakoNazwa(char** wskaznik)
     return zmienna;
 }
 
-char* wczytujZastrzezone(char** wskaznik)
+char* wczytujKluczowe(char** wskaznik)
 {
     char* polozenie = *wskaznik;
-    for(int i = 0; i < sizeof(slowaZastrzezone)/sizeof(slowaZastrzezone[0]); i++)
+    for(int i = 0; i < sizeof(slowaKluczowe)/sizeof(slowaKluczowe[0]); i++)
     {
-        size_t dlugosc = strlen(slowaZastrzezone[i]);
+        size_t dlugosc = strlen(slowaKluczowe[i]);
         if(dlugosc > koniec - polozenie) continue;
-        if(memcmp(slowaZastrzezone[i], polozenie, dlugosc) != 0) continue;
+        if(memcmp(slowaKluczowe[i], polozenie, dlugosc) != 0) continue;
         if(isalpha((unsigned char)polozenie[dlugosc])) continue;
         *wskaznik += dlugosc;
-        return slowaZastrzezone[i];
+        return slowaKluczowe[i];
     }
     return NULL;
 }
@@ -294,7 +280,7 @@ Zmienna* (*konajkiDoZmiennych[])(char**) = {wczytujJakoObszar, wczytujJakoLiczbe
 Czastka wczytujNastepne(char** wskaznik)
 {
     void* wynik;
-    wynik = wczytujZastrzezone(wskaznik);
+    wynik = wczytujKluczowe(wskaznik);
     if(wynik != NULL)
     {
         Czastka c = {1, wynik};
