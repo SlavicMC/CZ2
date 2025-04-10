@@ -1,6 +1,5 @@
 # Autorzy:
-Maciej Cieżak
-Seweryn Fronc
+Maciej Cieżak, Seweryn Fronc
 
 # Pliki repozytorium:
 - `czytnik.c` - główny program języka, podaje się mu plik w formie kodu źródłowego (.cz) lub kodu wykonywalnego (.czp)
