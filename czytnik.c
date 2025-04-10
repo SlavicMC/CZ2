@@ -5,37 +5,19 @@
 #include <ctype.h>
 #include <gmp.h>
 
+#include "dzielone.h"
+
 typedef void (*Polecenie)();
-
-typedef struct
-{
-    uintptr_t rozmiar;                  // liczba bytów używana przez zawartość
-    uintptr_t rod;                      // ród, wskazuje na inną zmienną która jest zmienną rodową lub na siebie jeśli sama nią jest
-    uintptr_t cechy;                    // liczba cech (zmiennych przypisanych do tej zmiennej)
-    uintptr_t pojemnosc;                // ilość przypisanej pamięci
-} Zmienna;
-
-typedef struct
-{
-    boolean czyDoslowne;
-    char* zawartosc;
-} CzescZasady;
 
 
 Zmienna** zmienne;                      // zmienne
-uintptr_t liczbaZmiennych = 0;          // liczba używanych zmiennych
-uintptr_t pojemnoscZmiennych = 0;       // przypisane zmiennym miejsce
+size_t liczbaZmiennych = 0;             // liczba używanych zmiennych
+size_t pojemnoscZmiennych = 0;          // przypisane zmiennym miejsce
 
 FILE* zrodlo;
 const char hasloCzp[] = { 0x50, 0x49, 0x45, 0x52, 0x57, 0x53, 0x5A, 0x59 }; // "PIERWSZY" zapisane szesnastkowo
-CzescZasady zasady[][3] =
-{
-    {{TRUE, "poki"}, {FALSE, "nawias"}, {FALSE, "spiecie"}},
-    {{TRUE, "jesli"}, {FALSE, "nawias"}, {FALSE, "spiecie"}},
-    {{FALSE, "zmienna"}, {TRUE, "*"}, {FALSE, "zmienna"}},
-    {{FALSE, "zmienna"}, {TRUE, "+"}, {FALSE, "zmienna"}},
-    {{FALSE, "zmienna"}, {TRUE, "="}, {FALSE, "zmienna"}}
-};
+char* poczatek = NULL;
+char* koniec = NULL;
 
 char** nazwyPolecen = {"tlumacz", "czytaj"};
 int liczbaPolecen = 0;
@@ -157,17 +139,53 @@ void przygotowanieDlaCz()
     zmienne[liczbaZmiennych] = obszarDomyslny;
 }
 
-Zmienna* wczytujJakoObszar(char* polozenie)
+Czastka wczytujNastepne(char** wskaznik);
+
+Zmienna* wczytujJakoObszar(char** wskaznik)
 {
-    if(polozenie[0] != '{') return NULL;
+    char* polozenie = *wskaznik;
+    if(polozenie[0] != '{' && polozenie - poczatek != 0) return NULL;
+    if(polozenie[0] == '{') polozenie++;
+    Czastka* czastkiObszaru = (Czastka*)malloc(sizeof(Czastka));
+    size_t pojemnoscObszaru = 1;
+    size_t rozmiarObszaru = 0;
+    while(TRUE)
+    {
+        while(polozenie[0] == ' ' || polozenie[0] == '\n') polozenie++;
+        if(polozenie >= koniec) break;
+        if (polozenie >= koniec || polozenie[0] == '}')
+        {
+            if(polozenie[0] == '}') polozenie += 1;
+            *wskaznik = polozenie;
+            break;
+        }
+        Czastka c = wczytujNastepne(&polozenie);
+        if(pojemnoscObszaru == rozmiarObszaru)
+        {
+            pojemnoscObszaru *= 2;
+            czastkiObszaru = realloc(czastkiObszaru, sizeof(Czastka) * pojemnoscObszaru);
+            if(czastkiObszaru == NULL) niezbywalnyBlad("Brak pamieci");
+        }
+        czastkiObszaru[rozmiarObszaru++] = c;
+    }
+    
+
+    Zmienna* zmienna = (Zmienna*)malloc(sizeof(Zmienna) + 2*sizeof(uintptr_t));
+    zmienna->rod = 1;
+    zmienna->rozmiar = 2*sizeof(uintptr_t);
+    zmienna->pojemnosc = 2*sizeof(uintptr_t);
+    zmienna->cechy = 0;
+    memset((char*)zmienna + sizeof(Zmienna), 0, 2 * sizeof(uintptr_t));
+    return zmienna;
 }
 
-Zmienna* wczytujJakoLiczbe(char* polozenie)
+Zmienna* wczytujJakoLiczbe(char** wskaznik)
 {
+    char* polozenie = *wskaznik;
     if(!isdigit((unsigned char)polozenie[0])) return NULL;
     char* pierwotne = polozenie;
-    while(isdigit((unsigned char)polozenie[0])) polozenie++;
-    size_t dlugosc = polozenie - pierwotne;
+    while(isdigit((unsigned char)polozenie[0]) && polozenie < koniec) polozenie++;
+    uintptr_t dlugosc = polozenie - pierwotne;
     char* liczba = malloc(dlugosc + 1);
     memcpy(liczba, pierwotne, dlugosc);
     liczba[dlugosc] = '\0';
@@ -186,82 +204,120 @@ Zmienna* wczytujJakoLiczbe(char* polozenie)
     mpz_clear(liczba_mpz);
     free(liczba);
     free(surowa);
+    *wskaznik += dlugosc;
     return zmienna;
 }
 
-Zmienna* (*konajkiDoZmiennych)(char*) = {wczytujJakoObszar, wczytujJakoLiczbe};
-
-boolean czyPasujeDoZasady(int odnosnikZasady, char* polozenie)
+Zmienna* wczytujJakoPismo(char** wskaznik)
 {
-    CzescZasady zasada[] = zasady[odnosnikZasady];
-    for(int i = 0; i < 3; i++)
-    {
-        while(polozenie[0] == ' ' || polozenie[0] == '\n') polozenie++;
-        if(zasada->czyDoslowne)
-        {
-            for(int j = 0; j < strlen(zasada->zawartosc); j++)
-            {
-                if(&polozenie != zasada->zawartosc[j]) return FALSE;
-                polozenie++;
-            }
-        }
-        else
-        {
-            if(strcmp("zmienna", zasada->zawartosc) == 0)
-            {
-                
-            }
-            else if(strcmp("nawias", zasada->zawartosc) == 0)
-            {
-
-            }
-            else if(strcmp("spiecie", zasada->zawartosc) == 0)
-            {
-                
-            }
-        }
-    }
+    char* polozenie = *wskaznik;
+    if(polozenie[0] != '"') return NULL;
+    char* pierwotne = ++polozenie;
+    while(polozenie[0] != '"') polozenie++;
+    uintptr_t dlugosc = polozenie - pierwotne;
+    uintptr_t pojemnosc = nastepnaPotegaDwojki(dlugosc);
+    Zmienna* zmienna = (Zmienna*)malloc(sizeof(Zmienna) + pojemnosc);
+    if(zmienna == NULL) niezbywalnyBlad("Brak pamieci");
+    zmienna->cechy = 0;
+    zmienna->rod = 3;
+    zmienna->pojemnosc = pojemnosc;
+    zmienna->rozmiar = dlugosc;
+    memcpy((char*)zmienna + sizeof(Zmienna), pierwotne, dlugosc);
+    *wskaznik += dlugosc + 2;
+    return zmienna;
 }
 
-void wczytujNieznajomego(char* polozenie)
+Zmienna* wczytujJakoNazwa(char** wskaznik)
 {
-    /*char* zawartosc = malloc(8);
-    uintptr_t dlugoscZawartosci = 0;
-    uintptr_t pojemnoscZawartosci = 8;
-    while(TRUE)
+    char* polozenie = *wskaznik;
+    if(!isalpha((unsigned char)polozenie[0])) return NULL;
+    char* pierwotne = polozenie;
+    while(isalpha((unsigned char)polozenie[0])) polozenie++;
+    uintptr_t dlugosc = polozenie - pierwotne;
+    uintptr_t pojemnosc = nastepnaPotegaDwojki(dlugosc);
+    Zmienna* zmienna = (Zmienna*)malloc(sizeof(Zmienna) + pojemnosc);
+    if(zmienna == NULL) niezbywalnyBlad("Brak pamieci");
+    zmienna->cechy = 0;
+    zmienna->rod = 0;
+    zmienna->pojemnosc = pojemnosc;
+    zmienna->rozmiar = dlugosc;
+    memcpy((char*)zmienna + sizeof(Zmienna), pierwotne, dlugosc);
+    *wskaznik += dlugosc;
+    return zmienna;
+}
+
+char* wczytujKluczowe(char** wskaznik)
+{
+    char* polozenie = *wskaznik;
+    for(int i = 0; i < sizeof(slowaKluczowe)/sizeof(slowaKluczowe[0]); i++)
     {
-        if(dlugoscZawartosci == pojemnoscZawartosci)
-        {
-            zawartosc = (char*)realloc(zawartosc, pojemnoscZawartosci*2);
-            if(zawartosc == NULL) niezbywalnyBlad("Brak pamieci");
-        }
-        zawartosc
-    }*/
-    int liczbaZasad = sizeof(zasady) / sizeof(zasady[0]);
-    for(int i = 0; i < liczbaZasad; i++)
-    {
-        
+        size_t dlugosc = strlen(slowaKluczowe[i]);
+        if(dlugosc > koniec - polozenie) continue;
+        if(memcmp(slowaKluczowe[i], polozenie, dlugosc) != 0) continue;
+        if(isalpha((unsigned char)polozenie[dlugosc])) continue;
+        *wskaznik += dlugosc;
+        return slowaKluczowe[i];
     }
+    return NULL;
+}
+
+char* wczytujDzialania(char** wskaznik)
+{
+    char* polozenie = *wskaznik;
+    for(int i = 0; i < sizeof(dzialania)/sizeof(dzialania[0]); i++)
+    {
+        size_t dlugosc = strlen(dzialania[i]);
+        if(dlugosc > koniec - polozenie) continue;
+        if(memcmp(dzialania[i], polozenie, dlugosc) != 0) continue;
+        *wskaznik += dlugosc;
+        return dzialania[i];
+    }
+    return NULL;
+}
+
+Zmienna* (*konajkiDoZmiennych[])(char**) = {wczytujJakoObszar, wczytujJakoLiczbe, wczytujJakoPismo, wczytujJakoNazwa};
+
+Czastka wczytujNastepne(char** wskaznik)
+{
+    void* wynik;
+    wynik = wczytujKluczowe(wskaznik);
+    if(wynik != NULL)
+    {
+        Czastka c = {1, wynik};
+        return c;
+    }
+    wynik = wczytujDzialania(wskaznik);
+    if(wynik != NULL)
+    {
+        Czastka c = {3, wynik};
+        return c;
+    }
+    for(int i = 0; i < sizeof(konajkiDoZmiennych) / sizeof(konajkiDoZmiennych[0]); i++)
+    {
+        wynik = konajkiDoZmiennych[i](wskaznik);
+        if(wynik != NULL)
+        {
+            Czastka c = {2, wynik};
+            return c;
+        }
+    }
+    Czastka c = {0, *wskaznik};
+    return c;
 }
 
 void tlumacz()
 {
     fseek(zrodlo, 0, SEEK_END);
-    uintptr_t rozmiar = ftell(zrodlo);
+    size_t rozmiar = ftell(zrodlo);
     rewind(zrodlo);
 
-    char *tlumaczony = (char*)malloc(rozmiar + 1);
-    if (!tlumaczony) {
-        niezbywalnyBlad("Brak pamieci");
-        return 1;
-    }
-    fread(tlumaczony, 1, rozmiar, zrodlo);
-    tlumaczony[rozmiar] = '\0';
+    poczatek = (char*)malloc(rozmiar + 1);
+    if(!poczatek) niezbywalnyBlad("Brak pamieci");
+    fread(poczatek, 1, rozmiar, zrodlo);
+    char* obecny = poczatek;
+    koniec = poczatek + rozmiar;
 
-    for(uintptr_t i = 0; i < rozmiar; i++)
-    {
-        wczytujNieznajomego(tlumaczony);
-    }
+    Zmienna* zmienna = wczytujJakoObszar(obecny);
 }
 
 void czytaj()
