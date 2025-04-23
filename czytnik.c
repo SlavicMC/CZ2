@@ -32,7 +32,7 @@ size_t* wskaznikOdnosnikaPolecenia;
 char* poczet;
 
 char* slowaKluczowe[] = {"###", "jesli", "poki"};
-char* dzialania[] = {"+", "-", "*", "/", "="};
+char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+", "-", "*", "/", "=", "!", ">", "<"}; // działania idą w kolejności malejącej długości (najpierw sprawdzamy najdłuższe)
 
 char* nazwyPolecen[] = {"tlumacz", "czytaj"};
 size_t liczbaPolecen = 0;
@@ -260,6 +260,7 @@ size_t wczytujJakoObszarGlowny(char** wskaznik)
 {
     printf("Rozpoczeto wczytywanie obszaru glownego\n");
     char* polozenie = *wskaznik;
+    printf("Zaladowany tekst:\n%s\n", polozenie);
     
     size_t liczbaZmiennychObszaru = 1;
     size_t pojemnoscZmiennychObszaru = 1;
@@ -273,14 +274,14 @@ size_t wczytujJakoObszarGlowny(char** wskaznik)
 
     while(TRUE)
     {
-        while(polozenie[0] == ' ' || polozenie[0] == '\n') polozenie++;
+        while(polozenie < koniec && isspace((unsigned char)polozenie[0])) polozenie++;
         if(polozenie >= koniec)
         {
             *wskaznik = polozenie;
-            printf("Wyjebalo sie X_X");
+            printf("Wyjebalo sie X_X\n");
             break;
         }
-        printf("Zapierdalam");
+        printf("Zapierdalam\n");
         Czastka c = wczytujNastepne(&polozenie);
         if(c.rodzaj == 1 && (char*)c.zawartosc == slowaKluczowe[0]) break; // kończymy jeśli napotkamy ###
         if(rozmiarCzastekObszaru >= pojemnoscCzastekObszaru)
@@ -296,8 +297,11 @@ size_t wczytujJakoObszarGlowny(char** wskaznik)
     for(size_t i = 0; i < rozmiarCzastekObszaru; i++)
     {
         if(czastkiObszaru[i].rodzaj == 2) printf("Czastka %zu: %hhu - %zu\n", i, czastkiObszaru[i].rodzaj, (size_t)czastkiObszaru[i].zawartosc);
-        else printf("Czastka %zu: %hhu - %p\n", i, czastkiObszaru[i].rodzaj, (void*)czastkiObszaru[i].zawartosc);
+        else if(czastkiObszaru[i].rodzaj == 0) printf("Czastka %zu: %hhu - %c\n", i, czastkiObszaru[i].rodzaj, *((char*)czastkiObszaru[i].zawartosc));
+        else printf("Czastka %zu: %hhu - %s\n", i, czastkiObszaru[i].rodzaj, (char*)czastkiObszaru[i].zawartosc);
     }
+
+    getchar();
 
     printf("Rozpoczeto robienie drzewa\n");
     Rozgalezienie* drzewo = robDrzewo(czastkiObszaru, rozmiarCzastekObszaru);
@@ -306,6 +310,7 @@ size_t wczytujJakoObszarGlowny(char** wskaznik)
     zetnijRozgalezienie(drzewo);
     free(zmienneObszaru);
     free(czastkiObszaru);
+    getchar();
 
     return 0;
 }
@@ -326,13 +331,13 @@ size_t wczytujJakoObszar(char** wskaznik) // nie pojawi się w pierwszym teście
     OdnosnikZmiennejINazwa* zmienneObszaru = (OdnosnikZmiennejINazwa*)malloc(sizeof(OdnosnikZmiennejINazwa) * pojemnoscZmiennychObszaru);
     zmienneObszaru[0].odnosnik = 0;
     zmienneObszaru[0].nazwa = NULL;
-    while(polozenie[0] == ' ' || polozenie[0] == '\n') polozenie++;
+    while(polozenie < koniec && isspace((unsigned char)polozenie[0])) polozenie++;
     if(polozenie[0] == '(')
     {
         polozenie++;
         while(TRUE)
         {
-            while(polozenie[0] == ' ' || polozenie[0] == '\n') polozenie++;
+            while(polozenie < koniec && isspace((unsigned char)polozenie[0])) polozenie++;
             if(polozenie[0] == ')') 
             {
                 polozenie++;
@@ -350,7 +355,7 @@ size_t wczytujJakoObszar(char** wskaznik) // nie pojawi się w pierwszym teście
             zmienneObszaru[liczbaZmiennychObszaru].odnosnik = odnosnik;
             zmienneObszaru[liczbaZmiennychObszaru++].nazwa = zawartosc(zmienne[odnosnik]);
 
-            while(polozenie[0] == ' ' || polozenie[0] == '\n') polozenie++;
+            while(polozenie < koniec && isspace((unsigned char)polozenie[0])) polozenie++;
 
             if(polozenie[0] == ',') 
             {
@@ -375,7 +380,7 @@ size_t wczytujJakoObszar(char** wskaznik) // nie pojawi się w pierwszym teście
         size_t rozmiarCzastekObszaru = 0;
         while(TRUE)
         {
-            while(polozenie[0] == ' ' || polozenie[0] == '\n') polozenie++;
+            while(polozenie < koniec && isspace((unsigned char)polozenie[0])) polozenie++;
             if(polozenie >= koniec || polozenie[0] == '}')
             {
                 if(polozenie[0] == '}') polozenie += 1;
@@ -411,21 +416,47 @@ size_t wczytujJakoLiczbe(char** wskaznik)
     char* polozenie = *wskaznik;
     if(!isdigit((unsigned char)polozenie[0])) return 0;
     char* pierwotne = polozenie;
-    while(isdigit((unsigned char)polozenie[0]) && polozenie < koniec) polozenie++;
-    uintptr_t dlugosc = polozenie - pierwotne;
+    while(polozenie < koniec && isdigit((unsigned char)polozenie[0])) polozenie++;
+
+    size_t dlugosc = polozenie - pierwotne;
+    //printf("Wczytujemy liczbe: ");
+    //fwrite(pierwotne, 1, dlugosc, stdout);
+    //printf("\n");
+
     char* liczba = malloc(dlugosc + 1);
+    if(!liczba) niezbywalnyBlad("Brak pamieci");
+
     memcpy(liczba, pierwotne, dlugosc);
     liczba[dlugosc] = '\0';
+    //printf("Zapisano liczbe: %s. Zaraz wszystko sie posypie X~X\n", liczba);
+
     mpz_t liczba_mpz;
     mpz_init(liczba_mpz);
-    mpz_set_str(liczba_mpz, liczba, 10);
-    uintptr_t rozmiar;
-    unsigned char* surowa = (unsigned char*)mpz_export(NULL, &rozmiar, 1, 1, 0, 0, liczba_mpz);
+    //printf("Jeszcze zyjemy!\n");
+
+    if(mpz_set_str(liczba_mpz, liczba, 10) != 0)
+    {
+        mpz_clear(liczba_mpz);
+        free(liczba);
+        niezbywalnyBlad("Przeksztalcanie liczby nie powiodlo sie");
+    }
+    size_t rozmiar;
+    void* surowa = mpz_export(NULL, &rozmiar, 1, 1, 0, 0, liczba_mpz);
+    if(!surowa && mpz_cmp_ui(liczba_mpz, 0) != 0)
+    {
+        mpz_clear(liczba_mpz);
+        free(liczba);
+        niezbywalnyBlad("Blad eksportu liczby");
+    }
     size_t wynik = utworzZmienna(rozmiar, 1, 2, surowa);
+    //printf("Utworzono zmienna na miejscu %zu\n", wynik);
+    //printf("Przed mpz_clear\n");
     mpz_clear(liczba_mpz);
+    //printf("Przed free(liczba)\n");
     free(liczba);
-    if(surowa) free(surowa);
+    //printf("Przed przesunieciem wskaznika\n");
     *wskaznik += dlugosc;
+    //printf("Liczba wczytana! ^-^\n");
     return wynik;
 }
 
@@ -502,21 +533,25 @@ Czastka wczytujNastepne(char** wskaznik)
     if(wynik)
     {
         Czastka c = {1, wynik};
+        printf("Wczytano kluczowe: %s\n", (char*)wynik);
         return c;
     }
     wynik = (uintptr_t)wczytujDzialania(wskaznik);
     if(wynik)
     {
         Czastka c = {3, wynik};
+        printf("Wczytano dzialanie: %s\n", (char*)wynik);
         return c;
     }
     wynik = wczytujZmienne(wskaznik);
     if(wynik)
     {
         Czastka c = {2, wynik};
+        printf("Wczytano zmienna: %zu\n", (size_t)wynik);
         return c;
     }
-    Czastka c = {0, (uintptr_t)*wskaznik};
+    printf("Wczytano nieznany: %c\n", **wskaznik);
+    Czastka c = {0, (uintptr_t)((*wskaznik)++)};
     return c;
 }
 
@@ -563,6 +598,7 @@ int main(int argc, char *argv[])
     {
         niezbywalnyBlad("Wymagany pek .czp lub .cz");
     }
+    printf("Zapisano obszar przygotowawczy na miejscu %zu\n", obszarPrzygotowawczy);
 
     polecenia = (Polecenie*)malloc(sizeof(Polecenie*) * pojemnoscPolecen);
     if(!polecenia) niezbywalnyBlad("Brak pamieci");
@@ -579,6 +615,7 @@ int main(int argc, char *argv[])
     while(TRUE)
     {
         polecenia[poczet[++(*wskaznikOdnosnikaPolecenia)-1]]();
+        printf("Powrot do petli w main");
     }
 
     getchar();

@@ -62,17 +62,20 @@ extern int yydebug;
     MNOZ = 263,                    /* MNOZ  */
     DZIEL = 264,                   /* DZIEL  */
     NADAJ = 265,                   /* NADAJ  */
-    ROWNE = 266,                   /* ROWNE  */
-    ROZNE = 267,                   /* ROZNE  */
-    WIEKSZE = 268,                 /* WIEKSZE  */
-    MNIEJSZE = 269,                /* MNIEJSZE  */
-    WIEKSZE_BADZ_ROWNE = 270,      /* WIEKSZE_BADZ_ROWNE  */
-    MNIEJSZE_BADZ_ROWNE = 271,     /* MNIEJSZE_BADZ_ROWNE  */
-    SREDNIK = 272,                 /* SREDNIK  */
-    LNAWIAS = 273,                 /* LNAWIAS  */
-    PNAWIAS = 274,                 /* PNAWIAS  */
-    LSPIECIE = 275,                /* LSPIECIE  */
-    PSPIECIE = 276                 /* PSPIECIE  */
+    ODWROC = 266,                  /* ODWROC  */
+    ROWNE = 267,                   /* ROWNE  */
+    ROZNE = 268,                   /* ROZNE  */
+    WIEKSZE = 269,                 /* WIEKSZE  */
+    MNIEJSZE = 270,                /* MNIEJSZE  */
+    WIEKSZE_BADZ_ROWNE = 271,      /* WIEKSZE_BADZ_ROWNE  */
+    MNIEJSZE_BADZ_ROWNE = 272,     /* MNIEJSZE_BADZ_ROWNE  */
+    I = 273,                       /* I  */
+    LUB = 274,                     /* LUB  */
+    SREDNIK = 275,                 /* SREDNIK  */
+    LNAWIAS = 276,                 /* LNAWIAS  */
+    PNAWIAS = 277,                 /* PNAWIAS  */
+    LSPIECIE = 278,                /* LSPIECIE  */
+    PSPIECIE = 279                 /* PSPIECIE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -87,7 +90,7 @@ union YYSTYPE
     GalazPodwojna* galazPodwojna;
     Rozgalezienie* rozgalezienie;
 
-#line 91 "drzewiarz.tab.h"
+#line 94 "drzewiarz.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

@@ -22,15 +22,18 @@ Rozgalezienie* drzewo = NULL;
 %token <zmienna> ZMIENNA
 %token JESLI POKI
 %token DODAJ ODEJMIJ MNOZ DZIEL NADAJ
-%token ROWNE ROZNE WIEKSZE MNIEJSZE WIEKSZE_BADZ_ROWNE MNIEJSZE_BADZ_ROWNE
+%token ODWROC ROWNE ROZNE WIEKSZE MNIEJSZE WIEKSZE_BADZ_ROWNE MNIEJSZE_BADZ_ROWNE
+%token I LUB
 %token SREDNIK LNAWIAS PNAWIAS LSPIECIE PSPIECIE
 %type <rozgalezienie> wyrazenia
 %type <galazPodwojna> wyrazenie dzialanie
 
 %right NADAJ
+%left I LUB
 %left ROWNE ROZNE WIEKSZE MNIEJSZE WIEKSZE_BADZ_ROWNE MNIEJSZE_BADZ_ROWNE
 %left DODAJ ODEJMIJ
 %left MNOZ DZIEL
+%left ODWROC
 
 %start calosc
 
@@ -54,13 +57,22 @@ wyrazenie:
     ;
 
 dzialanie:
-      dzialanie DODAJ dzialanie     { $$ = utworzDzialanie(DODAJ, $1, $3); }
-    | dzialanie ODEJMIJ dzialanie   { $$ = utworzDzialanie(ODEJMIJ, $1, $3); }
-    | dzialanie MNOZ dzialanie      { $$ = utworzDzialanie(MNOZ, $1, $3); }
-    | dzialanie DZIEL dzialanie     { $$ = utworzDzialanie(DZIEL, $1, $3); }
-    | LNAWIAS dzialanie PNAWIAS     { $$ = $2; }
-    | dzialanie NADAJ dzialanie     { $$ = utworzDzialanie(NADAJ, $1, $3); }
-    | ZMIENNA                       { $$ = utworzZmiennaJakoGalaz($1); }
+      dzialanie NADAJ dzialanie                 { $$ = utworzDzialanie(NADAJ, $1, $3); }
+    | dzialanie DODAJ dzialanie                 { $$ = utworzDzialanie(DODAJ, $1, $3); }
+    | dzialanie ODEJMIJ dzialanie               { $$ = utworzDzialanie(ODEJMIJ, $1, $3); }
+    | dzialanie MNOZ dzialanie                  { $$ = utworzDzialanie(MNOZ, $1, $3); }
+    | dzialanie DZIEL dzialanie                 { $$ = utworzDzialanie(DZIEL, $1, $3); }
+    | ODWROC dzialanie                          { $$ = utworzDzialanie(ODWROC, $2, NULL); }
+    | dzialanie ROWNE dzialanie                 { $$ = utworzDzialanie(ROWNE, $1, $3); }
+    | dzialanie ROZNE dzialanie                 { $$ = utworzDzialanie(ROZNE, $1, $3); }
+    | dzialanie WIEKSZE dzialanie               { $$ = utworzDzialanie(WIEKSZE, $1, $3); }
+    | dzialanie MNIEJSZE dzialanie              { $$ = utworzDzialanie(MNIEJSZE, $1, $3); }
+    | dzialanie WIEKSZE_BADZ_ROWNE dzialanie    { $$ = utworzDzialanie(WIEKSZE_BADZ_ROWNE, $1, $3); }
+    | dzialanie MNIEJSZE_BADZ_ROWNE dzialanie   { $$ = utworzDzialanie(MNIEJSZE_BADZ_ROWNE, $1, $3); }
+    | dzialanie I dzialanie                     { $$ = utworzDzialanie(I, $1, $3); }
+    | dzialanie LUB dzialanie                   { $$ = utworzDzialanie(LUB, $1, $3); }
+    | LNAWIAS dzialanie PNAWIAS                 { $$ = $2; }
+    | ZMIENNA                                   { $$ = utworzZmiennaJakoGalaz($1); }
     ;
 
 %%
@@ -139,11 +151,14 @@ GalazPodwojna* utworzWyrazenieKluczowe(int dz, GalazPodwojna* lewy, Rozgalezieni
 
 int yylex(void)
 {
-    if (odnosnikCzastki >= liczbaCzastek) return 0;
+    printf("yylex rusza!\n");
+    if(odnosnikCzastki >= liczbaCzastek) return 0;
     Czastka czastka = czastki[odnosnikCzastki++];
     if(czastka.rodzaj == 0) // nieznany (nawiasy, klamry i średniki)
     {
         yylval.zmienna = 0;
+        printf("Wyslano nieznany: %c\n", ((char*)czastka.zawartosc)[0]);
+        getchar();
         switch (((char*)czastka.zawartosc)[0]) // nieznany to zawsze jeden bajt
         {
             case ';': return SREDNIK;
@@ -153,16 +168,22 @@ int yylex(void)
             case '}': return PSPIECIE;
             default:
                 fprintf(stderr, "Nieznany token\n");
+                getchar();
                 exit(EXIT_FAILURE);
         }
     }
     if(czastka.rodzaj == 1) // słowo kluczowe
     {
         yylval.zmienna = 0;
-        const int kluczowe[] = {JESLI, POKI};
-        for(int i = 0; i < sizeof(kluczowe) / sizeof(int); i++)
+        const int kluczowe[] = { 0, JESLI, POKI};
+        for(int i = 1; i < sizeof(kluczowe) / sizeof(int); i++)
         {
-            if((char*)czastka.zawartosc == slowaKluczowe[i]) return kluczowe[i]; // porównywanie wskaźników a nie stringów
+            if((char*)czastka.zawartosc == slowaKluczowe[i]) 
+            {
+                printf("Wyslano kluczowe: %s\n", slowaKluczowe[i]);
+                getchar();
+                return kluczowe[i]; // porównywanie wskaźników a nie stringów
+            }
         }
 
         for (int i = 0; i < sizeof(kluczowe) / sizeof(int); i++) // jeśli nic się nie znajdzie porównujemy zawartość dla pewności
@@ -170,16 +191,23 @@ int yylex(void)
             if(strcmp((char*)czastka.zawartosc, slowaKluczowe[i]) == 0) return kluczowe[i];
         }
         fprintf(stderr, "Nieznany token\n");
+        getchar();
         exit(EXIT_FAILURE);
     }
     if(czastka.rodzaj == 3) // działanie
     {
         yylval.zmienna = 0;
-        const int dzialaniowe[] = {DODAJ, ODEJMIJ, MNOZ, DZIEL, NADAJ};
+        // char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+", "-", "*", "/", "=", "!", ">", "<"};
+        const int dzialaniowe[] = {ROWNE, ROZNE, WIEKSZE_BADZ_ROWNE, MNIEJSZE_BADZ_ROWNE, LUB, I, DODAJ, ODEJMIJ, MNOZ, DZIEL, NADAJ, ODWROC, WIEKSZE, MNIEJSZE};
 
         for(int i = 0; i < sizeof(dzialaniowe) / sizeof(int); i++)
         {
-            if((char*)czastka.zawartosc == dzialania[i]) return dzialaniowe[i]; // porównywanie wskaźników a nie stringów
+            if((char*)czastka.zawartosc == dzialania[i]) 
+            {
+                printf("Wyslano dzialanie: %s\n", dzialania[i]);
+                getchar();
+                return dzialaniowe[i]; // porównywanie wskaźników a nie stringów
+            }
         }
 
         for (int i = 0; i < sizeof(dzialaniowe) / sizeof(int); i++) // jeśli nic się nie znajdzie porównujemy zawartość dla pewności
@@ -187,20 +215,26 @@ int yylex(void)
             if(strcmp((char*)czastka.zawartosc, dzialania[i]) == 0) return dzialaniowe[i];
         }
         fprintf(stderr, "Nieznany token\n");
+        getchar();
         exit(EXIT_FAILURE);
     }
     if(czastka.rodzaj == 2) // zmienna
     {
         yylval.zmienna = czastka.zawartosc;
+        printf("Wyslano zmienna: %zu\n", (size_t)czastka.zawartosc);
+        getchar();
         return ZMIENNA;
     }
     fprintf(stderr, "Nieznany token\n");
+    getchar();
     exit(EXIT_FAILURE);
 }
 
 void yyerror(const char *s)
 {
     fprintf(stderr, "Blad robienia drzewa: %s\n", s);
+    getchar();
+    exit(EXIT_FAILURE);
 }
 
 Rozgalezienie* robDrzewo(Czastka* cz, size_t l)
@@ -208,7 +242,28 @@ Rozgalezienie* robDrzewo(Czastka* cz, size_t l)
     czastki = cz;
     odnosnikCzastki = 0;
     liczbaCzastek = l;
-    yyparse();
+    if(!czastki || !liczbaCzastek)
+    {
+        printf("Podano puste dane!\n");
+        getchar();
+        return NULL;
+    }
+    drzewo = utworzRozgalezienie();
+    if (!drzewo)
+    {
+        fprintf(stderr, "Nie udalo sie zrobic drzewa\n");
+        getchar();
+        return NULL;
+    }
+    printf("Rozpoczynamy?");
+    getchar();
+    int result = yyparse();
+    if (result != 0)
+    {
+        fprintf(stderr, "Błąd podczas parsowania (kod: %d)\n", result);
+        getchar();
+        return NULL;
+    }
     return drzewo;
 }
 
@@ -247,18 +302,35 @@ void zetnijRozgalezienie(Rozgalezienie* rozgalezienie)
     free(rozgalezienie);
 }
 
-const char* nazwaRodzaju(int rodzaj)
-{
-    switch(rodzaj)
-    {
+const char* nazwaRodzaju(int rodzaj) {
+    switch(rodzaj) {
+        // Operatory arytmetyczne
         case DODAJ: return "DODAJ";
         case ODEJMIJ: return "ODEJMIJ";
         case MNOZ: return "MNOZ";
         case DZIEL: return "DZIEL";
+        case ODWROC: return "ODWROC";  // Nowy operator
+        
+        // Operator przypisania
         case NADAJ: return "NADAJ";
+        
+        // Operatory porównania
+        case ROWNE: return "ROWNE";
+        case ROZNE: return "ROZNE";
+        case WIEKSZE: return "WIEKSZE";
+        case MNIEJSZE: return "MNIEJSZE";
+        case WIEKSZE_BADZ_ROWNE: return "WIEKSZE_BADZ_ROWNE";
+        case MNIEJSZE_BADZ_ROWNE: return "MNIEJSZE_BADZ_ROWNE";
+        case I: return "I";
+        case LUB: return "LUB";
+        
+        // Instrukcje kontrolne
         case JESLI: return "JESLI";
         case POKI: return "POKI";
+        
+        // Zmienna
         case ZMIENNA: return "ZMIENNA";
+        
         default: return "???";
     }
 }

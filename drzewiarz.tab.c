@@ -121,22 +121,25 @@ enum yysymbol_kind_t
   YYSYMBOL_MNOZ = 8,                       /* MNOZ  */
   YYSYMBOL_DZIEL = 9,                      /* DZIEL  */
   YYSYMBOL_NADAJ = 10,                     /* NADAJ  */
-  YYSYMBOL_ROWNE = 11,                     /* ROWNE  */
-  YYSYMBOL_ROZNE = 12,                     /* ROZNE  */
-  YYSYMBOL_WIEKSZE = 13,                   /* WIEKSZE  */
-  YYSYMBOL_MNIEJSZE = 14,                  /* MNIEJSZE  */
-  YYSYMBOL_WIEKSZE_BADZ_ROWNE = 15,        /* WIEKSZE_BADZ_ROWNE  */
-  YYSYMBOL_MNIEJSZE_BADZ_ROWNE = 16,       /* MNIEJSZE_BADZ_ROWNE  */
-  YYSYMBOL_SREDNIK = 17,                   /* SREDNIK  */
-  YYSYMBOL_LNAWIAS = 18,                   /* LNAWIAS  */
-  YYSYMBOL_PNAWIAS = 19,                   /* PNAWIAS  */
-  YYSYMBOL_LSPIECIE = 20,                  /* LSPIECIE  */
-  YYSYMBOL_PSPIECIE = 21,                  /* PSPIECIE  */
-  YYSYMBOL_YYACCEPT = 22,                  /* $accept  */
-  YYSYMBOL_calosc = 23,                    /* calosc  */
-  YYSYMBOL_wyrazenia = 24,                 /* wyrazenia  */
-  YYSYMBOL_wyrazenie = 25,                 /* wyrazenie  */
-  YYSYMBOL_dzialanie = 26                  /* dzialanie  */
+  YYSYMBOL_ODWROC = 11,                    /* ODWROC  */
+  YYSYMBOL_ROWNE = 12,                     /* ROWNE  */
+  YYSYMBOL_ROZNE = 13,                     /* ROZNE  */
+  YYSYMBOL_WIEKSZE = 14,                   /* WIEKSZE  */
+  YYSYMBOL_MNIEJSZE = 15,                  /* MNIEJSZE  */
+  YYSYMBOL_WIEKSZE_BADZ_ROWNE = 16,        /* WIEKSZE_BADZ_ROWNE  */
+  YYSYMBOL_MNIEJSZE_BADZ_ROWNE = 17,       /* MNIEJSZE_BADZ_ROWNE  */
+  YYSYMBOL_I = 18,                         /* I  */
+  YYSYMBOL_LUB = 19,                       /* LUB  */
+  YYSYMBOL_SREDNIK = 20,                   /* SREDNIK  */
+  YYSYMBOL_LNAWIAS = 21,                   /* LNAWIAS  */
+  YYSYMBOL_PNAWIAS = 22,                   /* PNAWIAS  */
+  YYSYMBOL_LSPIECIE = 23,                  /* LSPIECIE  */
+  YYSYMBOL_PSPIECIE = 24,                  /* PSPIECIE  */
+  YYSYMBOL_YYACCEPT = 25,                  /* $accept  */
+  YYSYMBOL_calosc = 26,                    /* calosc  */
+  YYSYMBOL_wyrazenia = 27,                 /* wyrazenia  */
+  YYSYMBOL_wyrazenie = 28,                 /* wyrazenie  */
+  YYSYMBOL_dzialanie = 29                  /* dzialanie  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -464,19 +467,19 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  3
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   78
+#define YYLAST   164
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  22
+#define YYNTOKENS  25
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  5
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  16
+#define YYNRULES  25
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  37
+#define YYNSTATES  55
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   276
+#define YYMAXUTOK   279
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -517,15 +520,16 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    20,    21
+      15,    16,    17,    18,    19,    20,    21,    22,    23,    24
 };
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    40,    40,    44,    45,    49,    50,    51,    52,    53,
-      57,    58,    59,    60,    61,    62,    63
+       0,    43,    43,    47,    48,    52,    53,    54,    55,    56,
+      60,    61,    62,    63,    64,    65,    66,    67,    68,    69,
+      70,    71,    72,    73,    74,    75
 };
 #endif
 
@@ -542,10 +546,11 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
 static const char *const yytname[] =
 {
   "\"end of file\"", "error", "\"invalid token\"", "ZMIENNA", "JESLI",
-  "POKI", "DODAJ", "ODEJMIJ", "MNOZ", "DZIEL", "NADAJ", "ROWNE", "ROZNE",
-  "WIEKSZE", "MNIEJSZE", "WIEKSZE_BADZ_ROWNE", "MNIEJSZE_BADZ_ROWNE",
-  "SREDNIK", "LNAWIAS", "PNAWIAS", "LSPIECIE", "PSPIECIE", "$accept",
-  "calosc", "wyrazenia", "wyrazenie", "dzialanie", YY_NULLPTR
+  "POKI", "DODAJ", "ODEJMIJ", "MNOZ", "DZIEL", "NADAJ", "ODWROC", "ROWNE",
+  "ROZNE", "WIEKSZE", "MNIEJSZE", "WIEKSZE_BADZ_ROWNE",
+  "MNIEJSZE_BADZ_ROWNE", "I", "LUB", "SREDNIK", "LNAWIAS", "PNAWIAS",
+  "LSPIECIE", "PSPIECIE", "$accept", "calosc", "wyrazenia", "wyrazenie",
+  "dzialanie", YY_NULLPTR
 };
 
 static const char *
@@ -555,7 +560,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-16)
+#define YYPACT_NINF (-41)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -567,12 +572,14 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-static const yytype_int8 yypact[] =
+static const yytype_int16 yypact[] =
 {
-     -16,     3,    26,   -16,   -16,   -11,     6,    14,   -16,    51,
-      14,    14,    27,    14,    14,    14,    14,    14,   -16,    32,
-      46,   -16,    12,    12,   -16,   -16,    68,     5,     8,   -16,
-     -16,   -16,   -16,    -3,     1,   -16,   -16
+     -41,     3,    51,   -41,   -41,    -4,     5,    46,    46,   -41,
+     118,    46,    46,   -41,    67,    46,    46,    46,    46,    46,
+      46,    46,    46,    46,    46,    46,    46,    46,   -41,    84,
+     101,   -41,     2,     2,   -41,   -41,   133,     7,     7,     7,
+       7,     7,     7,   147,   147,    37,    40,   -41,   -41,   -41,
+     -41,    -3,     1,   -41,   -41
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -580,22 +587,24 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       3,     0,     2,     1,    16,     0,     0,     0,     4,     0,
+       3,     0,     2,     1,    25,     0,     0,     0,     0,     4,
+       0,     0,     0,    15,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     5,     0,
-       0,    14,    10,    11,    12,    13,    15,     0,     0,     3,
-       7,     3,     9,     0,     0,     6,     8
+       0,    24,    11,    12,    13,    14,    10,    16,    17,    18,
+      19,    20,    21,    22,    23,     0,     0,     3,     7,     3,
+       9,     0,     0,     6,     8
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -16,   -16,   -15,    20,    56
+     -41,   -41,   -40,    19,    12
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     1,     2,     8,     9
+       0,     1,     2,     9,    10
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -603,50 +612,72 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       4,     5,     6,     3,     4,     5,     6,    10,     4,     5,
-       6,     4,     5,     6,    33,     7,    34,     4,    35,     7,
-      15,    16,    36,     7,    11,    29,     7,     0,    31,     4,
-       5,     6,     7,    13,    14,    15,    16,    17,    13,    14,
-      15,    16,    17,     0,     7,     0,    21,    30,    32,     0,
-       0,    27,    13,    14,    15,    16,    17,    13,    14,    15,
-      16,    17,     0,    12,     0,    28,    19,    20,    18,    22,
-      23,    24,    25,    26,    13,    14,    15,    16,    17
+       4,     5,     6,     3,     4,     5,     6,    51,     7,    52,
+      17,    18,     7,    15,    16,    17,    18,    11,     8,    13,
+      14,    53,     8,    29,    30,    54,    12,    32,    33,    34,
+      35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
+       4,     5,     6,     4,     5,     6,     0,     0,     7,     4,
+       0,     7,     0,     0,     4,     5,     6,     7,     8,     0,
+      47,     8,     7,    49,    48,    50,     0,     8,     0,     0,
+       0,     0,     8,    15,    16,    17,    18,    19,     0,    20,
+      21,    22,    23,    24,    25,    26,    27,     0,     0,    31,
+      15,    16,    17,    18,    19,     0,    20,    21,    22,    23,
+      24,    25,    26,    27,     0,     0,    45,    15,    16,    17,
+      18,    19,     0,    20,    21,    22,    23,    24,    25,    26,
+      27,     0,     0,    46,    15,    16,    17,    18,    19,     0,
+      20,    21,    22,    23,    24,    25,    26,    27,    28,    15,
+      16,    17,    18,    19,     0,    20,    21,    22,    23,    24,
+      25,    26,    27,    15,    16,    17,    18,     0,     0,    20,
+      21,    22,    23,    24,    25
 };
 
 static const yytype_int8 yycheck[] =
 {
-       3,     4,     5,     0,     3,     4,     5,    18,     3,     4,
-       5,     3,     4,     5,    29,    18,    31,     3,    21,    18,
-       8,     9,    21,    18,    18,    20,    18,    -1,    20,     3,
-       4,     5,    18,     6,     7,     8,     9,    10,     6,     7,
-       8,     9,    10,    -1,    18,    -1,    19,    27,    28,    -1,
-      -1,    19,     6,     7,     8,     9,    10,     6,     7,     8,
-       9,    10,    -1,     7,    -1,    19,    10,    11,    17,    13,
-      14,    15,    16,    17,     6,     7,     8,     9,    10
+       3,     4,     5,     0,     3,     4,     5,    47,    11,    49,
+       8,     9,    11,     6,     7,     8,     9,    21,    21,     7,
+       8,    24,    21,    11,    12,    24,    21,    15,    16,    17,
+      18,    19,    20,    21,    22,    23,    24,    25,    26,    27,
+       3,     4,     5,     3,     4,     5,    -1,    -1,    11,     3,
+      -1,    11,    -1,    -1,     3,     4,     5,    11,    21,    -1,
+      23,    21,    11,    23,    45,    46,    -1,    21,    -1,    -1,
+      -1,    -1,    21,     6,     7,     8,     9,    10,    -1,    12,
+      13,    14,    15,    16,    17,    18,    19,    -1,    -1,    22,
+       6,     7,     8,     9,    10,    -1,    12,    13,    14,    15,
+      16,    17,    18,    19,    -1,    -1,    22,     6,     7,     8,
+       9,    10,    -1,    12,    13,    14,    15,    16,    17,    18,
+      19,    -1,    -1,    22,     6,     7,     8,     9,    10,    -1,
+      12,    13,    14,    15,    16,    17,    18,    19,    20,     6,
+       7,     8,     9,    10,    -1,    12,    13,    14,    15,    16,
+      17,    18,    19,     6,     7,     8,     9,    -1,    -1,    12,
+      13,    14,    15,    16,    17
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,    23,    24,     0,     3,     4,     5,    18,    25,    26,
-      18,    18,    26,     6,     7,     8,     9,    10,    17,    26,
-      26,    19,    26,    26,    26,    26,    26,    19,    19,    20,
-      25,    20,    25,    24,    24,    21,    21
+       0,    26,    27,     0,     3,     4,     5,    11,    21,    28,
+      29,    21,    21,    29,    29,     6,     7,     8,     9,    10,
+      12,    13,    14,    15,    16,    17,    18,    19,    20,    29,
+      29,    22,    29,    29,    29,    29,    29,    29,    29,    29,
+      29,    29,    29,    29,    29,    22,    22,    23,    28,    23,
+      28,    27,    27,    24,    24
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    22,    23,    24,    24,    25,    25,    25,    25,    25,
-      26,    26,    26,    26,    26,    26,    26
+       0,    25,    26,    27,    27,    28,    28,    28,    28,    28,
+      29,    29,    29,    29,    29,    29,    29,    29,    29,    29,
+      29,    29,    29,    29,    29,    29
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
        0,     2,     1,     0,     2,     2,     7,     5,     7,     5,
-       3,     3,     3,     3,     3,     3,     1
+       3,     3,     3,     3,     3,     2,     3,     3,     3,     3,
+       3,     3,     3,     3,     3,     1
 };
 
 
@@ -1110,97 +1141,151 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* calosc: wyrazenia  */
-#line 40 "drzewiarz.y"
+#line 43 "drzewiarz.y"
                 { drzewo = (yyvsp[0].rozgalezienie); }
-#line 1116 "drzewiarz.tab.c"
+#line 1147 "drzewiarz.tab.c"
     break;
 
   case 3: /* wyrazenia: %empty  */
-#line 44 "drzewiarz.y"
+#line 47 "drzewiarz.y"
                             { (yyval.rozgalezienie) = utworzRozgalezienie(); }
-#line 1122 "drzewiarz.tab.c"
+#line 1153 "drzewiarz.tab.c"
     break;
 
   case 4: /* wyrazenia: wyrazenia wyrazenie  */
-#line 45 "drzewiarz.y"
+#line 48 "drzewiarz.y"
                             { dodajGalaz((yyvsp[-1].rozgalezienie), (yyvsp[0].galazPodwojna)); (yyval.rozgalezienie) = (yyvsp[-1].rozgalezienie); }
-#line 1128 "drzewiarz.tab.c"
+#line 1159 "drzewiarz.tab.c"
     break;
 
   case 5: /* wyrazenie: dzialanie SREDNIK  */
-#line 49 "drzewiarz.y"
+#line 52 "drzewiarz.y"
                                                                     { (yyval.galazPodwojna) = (yyvsp[-1].galazPodwojna); }
-#line 1134 "drzewiarz.tab.c"
+#line 1165 "drzewiarz.tab.c"
     break;
 
   case 6: /* wyrazenie: JESLI LNAWIAS dzialanie PNAWIAS LSPIECIE wyrazenia PSPIECIE  */
-#line 50 "drzewiarz.y"
+#line 53 "drzewiarz.y"
                                                                     { (yyval.galazPodwojna) = utworzWyrazenieKluczowe(JESLI, (yyvsp[-4].galazPodwojna), (yyvsp[-1].rozgalezienie)); }
-#line 1140 "drzewiarz.tab.c"
+#line 1171 "drzewiarz.tab.c"
     break;
 
   case 7: /* wyrazenie: JESLI LNAWIAS dzialanie PNAWIAS wyrazenie  */
-#line 51 "drzewiarz.y"
+#line 54 "drzewiarz.y"
                                                                     { (yyval.galazPodwojna) = utworzWyrazenieKluczowe(JESLI, (yyvsp[-2].galazPodwojna), pojedynczeRozgalezienie((yyvsp[0].galazPodwojna))); }
-#line 1146 "drzewiarz.tab.c"
+#line 1177 "drzewiarz.tab.c"
     break;
 
   case 8: /* wyrazenie: POKI LNAWIAS dzialanie PNAWIAS LSPIECIE wyrazenia PSPIECIE  */
-#line 52 "drzewiarz.y"
+#line 55 "drzewiarz.y"
                                                                     { (yyval.galazPodwojna) = utworzWyrazenieKluczowe(POKI, (yyvsp[-4].galazPodwojna), (yyvsp[-1].rozgalezienie)); }
-#line 1152 "drzewiarz.tab.c"
+#line 1183 "drzewiarz.tab.c"
     break;
 
   case 9: /* wyrazenie: POKI LNAWIAS dzialanie PNAWIAS wyrazenie  */
-#line 53 "drzewiarz.y"
+#line 56 "drzewiarz.y"
                                                                     { (yyval.galazPodwojna) = utworzWyrazenieKluczowe(POKI, (yyvsp[-2].galazPodwojna), pojedynczeRozgalezienie((yyvsp[0].galazPodwojna))); }
-#line 1158 "drzewiarz.tab.c"
+#line 1189 "drzewiarz.tab.c"
     break;
 
-  case 10: /* dzialanie: dzialanie DODAJ dzialanie  */
-#line 57 "drzewiarz.y"
-                                    { (yyval.galazPodwojna) = utworzDzialanie(DODAJ, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1164 "drzewiarz.tab.c"
-    break;
-
-  case 11: /* dzialanie: dzialanie ODEJMIJ dzialanie  */
-#line 58 "drzewiarz.y"
-                                    { (yyval.galazPodwojna) = utworzDzialanie(ODEJMIJ, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1170 "drzewiarz.tab.c"
-    break;
-
-  case 12: /* dzialanie: dzialanie MNOZ dzialanie  */
-#line 59 "drzewiarz.y"
-                                    { (yyval.galazPodwojna) = utworzDzialanie(MNOZ, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1176 "drzewiarz.tab.c"
-    break;
-
-  case 13: /* dzialanie: dzialanie DZIEL dzialanie  */
+  case 10: /* dzialanie: dzialanie NADAJ dzialanie  */
 #line 60 "drzewiarz.y"
-                                    { (yyval.galazPodwojna) = utworzDzialanie(DZIEL, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1182 "drzewiarz.tab.c"
+                                                { (yyval.galazPodwojna) = utworzDzialanie(NADAJ, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
+#line 1195 "drzewiarz.tab.c"
     break;
 
-  case 14: /* dzialanie: LNAWIAS dzialanie PNAWIAS  */
+  case 11: /* dzialanie: dzialanie DODAJ dzialanie  */
 #line 61 "drzewiarz.y"
-                                    { (yyval.galazPodwojna) = (yyvsp[-1].galazPodwojna); }
-#line 1188 "drzewiarz.tab.c"
+                                                { (yyval.galazPodwojna) = utworzDzialanie(DODAJ, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
+#line 1201 "drzewiarz.tab.c"
     break;
 
-  case 15: /* dzialanie: dzialanie NADAJ dzialanie  */
+  case 12: /* dzialanie: dzialanie ODEJMIJ dzialanie  */
 #line 62 "drzewiarz.y"
-                                    { (yyval.galazPodwojna) = utworzDzialanie(NADAJ, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1194 "drzewiarz.tab.c"
+                                                { (yyval.galazPodwojna) = utworzDzialanie(ODEJMIJ, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
+#line 1207 "drzewiarz.tab.c"
     break;
 
-  case 16: /* dzialanie: ZMIENNA  */
+  case 13: /* dzialanie: dzialanie MNOZ dzialanie  */
 #line 63 "drzewiarz.y"
-                                    { (yyval.galazPodwojna) = utworzZmiennaJakoGalaz((yyvsp[0].zmienna)); }
-#line 1200 "drzewiarz.tab.c"
+                                                { (yyval.galazPodwojna) = utworzDzialanie(MNOZ, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
+#line 1213 "drzewiarz.tab.c"
+    break;
+
+  case 14: /* dzialanie: dzialanie DZIEL dzialanie  */
+#line 64 "drzewiarz.y"
+                                                { (yyval.galazPodwojna) = utworzDzialanie(DZIEL, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
+#line 1219 "drzewiarz.tab.c"
+    break;
+
+  case 15: /* dzialanie: ODWROC dzialanie  */
+#line 65 "drzewiarz.y"
+                                                { (yyval.galazPodwojna) = utworzDzialanie(ODWROC, (yyvsp[0].galazPodwojna), NULL); }
+#line 1225 "drzewiarz.tab.c"
+    break;
+
+  case 16: /* dzialanie: dzialanie ROWNE dzialanie  */
+#line 66 "drzewiarz.y"
+                                                { (yyval.galazPodwojna) = utworzDzialanie(ROWNE, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
+#line 1231 "drzewiarz.tab.c"
+    break;
+
+  case 17: /* dzialanie: dzialanie ROZNE dzialanie  */
+#line 67 "drzewiarz.y"
+                                                { (yyval.galazPodwojna) = utworzDzialanie(ROZNE, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
+#line 1237 "drzewiarz.tab.c"
+    break;
+
+  case 18: /* dzialanie: dzialanie WIEKSZE dzialanie  */
+#line 68 "drzewiarz.y"
+                                                { (yyval.galazPodwojna) = utworzDzialanie(WIEKSZE, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
+#line 1243 "drzewiarz.tab.c"
+    break;
+
+  case 19: /* dzialanie: dzialanie MNIEJSZE dzialanie  */
+#line 69 "drzewiarz.y"
+                                                { (yyval.galazPodwojna) = utworzDzialanie(MNIEJSZE, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
+#line 1249 "drzewiarz.tab.c"
+    break;
+
+  case 20: /* dzialanie: dzialanie WIEKSZE_BADZ_ROWNE dzialanie  */
+#line 70 "drzewiarz.y"
+                                                { (yyval.galazPodwojna) = utworzDzialanie(WIEKSZE_BADZ_ROWNE, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
+#line 1255 "drzewiarz.tab.c"
+    break;
+
+  case 21: /* dzialanie: dzialanie MNIEJSZE_BADZ_ROWNE dzialanie  */
+#line 71 "drzewiarz.y"
+                                                { (yyval.galazPodwojna) = utworzDzialanie(MNIEJSZE_BADZ_ROWNE, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
+#line 1261 "drzewiarz.tab.c"
+    break;
+
+  case 22: /* dzialanie: dzialanie I dzialanie  */
+#line 72 "drzewiarz.y"
+                                                { (yyval.galazPodwojna) = utworzDzialanie(I, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
+#line 1267 "drzewiarz.tab.c"
+    break;
+
+  case 23: /* dzialanie: dzialanie LUB dzialanie  */
+#line 73 "drzewiarz.y"
+                                                { (yyval.galazPodwojna) = utworzDzialanie(LUB, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
+#line 1273 "drzewiarz.tab.c"
+    break;
+
+  case 24: /* dzialanie: LNAWIAS dzialanie PNAWIAS  */
+#line 74 "drzewiarz.y"
+                                                { (yyval.galazPodwojna) = (yyvsp[-1].galazPodwojna); }
+#line 1279 "drzewiarz.tab.c"
+    break;
+
+  case 25: /* dzialanie: ZMIENNA  */
+#line 75 "drzewiarz.y"
+                                                { (yyval.galazPodwojna) = utworzZmiennaJakoGalaz((yyvsp[0].zmienna)); }
+#line 1285 "drzewiarz.tab.c"
     break;
 
 
-#line 1204 "drzewiarz.tab.c"
+#line 1289 "drzewiarz.tab.c"
 
       default: break;
     }
@@ -1393,7 +1478,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 66 "drzewiarz.y"
+#line 78 "drzewiarz.y"
 
 
 GalazPodwojna* utworzZmiennaJakoGalaz(size_t z)
@@ -1470,11 +1555,14 @@ GalazPodwojna* utworzWyrazenieKluczowe(int dz, GalazPodwojna* lewy, Rozgalezieni
 
 int yylex(void)
 {
-    if (odnosnikCzastki >= liczbaCzastek) return 0;
+    printf("yylex rusza!\n");
+    if(odnosnikCzastki >= liczbaCzastek) return 0;
     Czastka czastka = czastki[odnosnikCzastki++];
     if(czastka.rodzaj == 0) // nieznany (nawiasy, klamry i średniki)
     {
         yylval.zmienna = 0;
+        printf("Wyslano nieznany: %c\n", ((char*)czastka.zawartosc)[0]);
+        getchar();
         switch (((char*)czastka.zawartosc)[0]) // nieznany to zawsze jeden bajt
         {
             case ';': return SREDNIK;
@@ -1484,16 +1572,22 @@ int yylex(void)
             case '}': return PSPIECIE;
             default:
                 fprintf(stderr, "Nieznany token\n");
+                getchar();
                 exit(EXIT_FAILURE);
         }
     }
     if(czastka.rodzaj == 1) // słowo kluczowe
     {
         yylval.zmienna = 0;
-        const int kluczowe[] = {JESLI, POKI};
-        for(int i = 0; i < sizeof(kluczowe) / sizeof(int); i++)
+        const int kluczowe[] = { 0, JESLI, POKI};
+        for(int i = 1; i < sizeof(kluczowe) / sizeof(int); i++)
         {
-            if((char*)czastka.zawartosc == slowaKluczowe[i]) return kluczowe[i]; // porównywanie wskaźników a nie stringów
+            if((char*)czastka.zawartosc == slowaKluczowe[i]) 
+            {
+                printf("Wyslano kluczowe: %s\n", slowaKluczowe[i]);
+                getchar();
+                return kluczowe[i]; // porównywanie wskaźników a nie stringów
+            }
         }
 
         for (int i = 0; i < sizeof(kluczowe) / sizeof(int); i++) // jeśli nic się nie znajdzie porównujemy zawartość dla pewności
@@ -1501,16 +1595,23 @@ int yylex(void)
             if(strcmp((char*)czastka.zawartosc, slowaKluczowe[i]) == 0) return kluczowe[i];
         }
         fprintf(stderr, "Nieznany token\n");
+        getchar();
         exit(EXIT_FAILURE);
     }
     if(czastka.rodzaj == 3) // działanie
     {
         yylval.zmienna = 0;
-        const int dzialaniowe[] = {DODAJ, ODEJMIJ, MNOZ, DZIEL, NADAJ};
+        // char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+", "-", "*", "/", "=", "!", ">", "<"};
+        const int dzialaniowe[] = {ROWNE, ROZNE, WIEKSZE_BADZ_ROWNE, MNIEJSZE_BADZ_ROWNE, LUB, I, DODAJ, ODEJMIJ, MNOZ, DZIEL, NADAJ, ODWROC, WIEKSZE, MNIEJSZE};
 
         for(int i = 0; i < sizeof(dzialaniowe) / sizeof(int); i++)
         {
-            if((char*)czastka.zawartosc == dzialania[i]) return dzialaniowe[i]; // porównywanie wskaźników a nie stringów
+            if((char*)czastka.zawartosc == dzialania[i]) 
+            {
+                printf("Wyslano dzialanie: %s\n", dzialania[i]);
+                getchar();
+                return dzialaniowe[i]; // porównywanie wskaźników a nie stringów
+            }
         }
 
         for (int i = 0; i < sizeof(dzialaniowe) / sizeof(int); i++) // jeśli nic się nie znajdzie porównujemy zawartość dla pewności
@@ -1518,20 +1619,26 @@ int yylex(void)
             if(strcmp((char*)czastka.zawartosc, dzialania[i]) == 0) return dzialaniowe[i];
         }
         fprintf(stderr, "Nieznany token\n");
+        getchar();
         exit(EXIT_FAILURE);
     }
     if(czastka.rodzaj == 2) // zmienna
     {
         yylval.zmienna = czastka.zawartosc;
+        printf("Wyslano zmienna: %zu\n", (size_t)czastka.zawartosc);
+        getchar();
         return ZMIENNA;
     }
     fprintf(stderr, "Nieznany token\n");
+    getchar();
     exit(EXIT_FAILURE);
 }
 
 void yyerror(const char *s)
 {
     fprintf(stderr, "Blad robienia drzewa: %s\n", s);
+    getchar();
+    exit(EXIT_FAILURE);
 }
 
 Rozgalezienie* robDrzewo(Czastka* cz, size_t l)
@@ -1539,7 +1646,28 @@ Rozgalezienie* robDrzewo(Czastka* cz, size_t l)
     czastki = cz;
     odnosnikCzastki = 0;
     liczbaCzastek = l;
-    yyparse();
+    if(!czastki || !liczbaCzastek)
+    {
+        printf("Podano puste dane!\n");
+        getchar();
+        return NULL;
+    }
+    drzewo = utworzRozgalezienie();
+    if (!drzewo)
+    {
+        fprintf(stderr, "Nie udalo sie zrobic drzewa\n");
+        getchar();
+        return NULL;
+    }
+    printf("Rozpoczynamy?");
+    getchar();
+    int result = yyparse();
+    if (result != 0)
+    {
+        fprintf(stderr, "Błąd podczas parsowania (kod: %d)\n", result);
+        getchar();
+        return NULL;
+    }
     return drzewo;
 }
 
@@ -1578,18 +1706,35 @@ void zetnijRozgalezienie(Rozgalezienie* rozgalezienie)
     free(rozgalezienie);
 }
 
-const char* nazwaRodzaju(int rodzaj)
-{
-    switch(rodzaj)
-    {
+const char* nazwaRodzaju(int rodzaj) {
+    switch(rodzaj) {
+        // Operatory arytmetyczne
         case DODAJ: return "DODAJ";
         case ODEJMIJ: return "ODEJMIJ";
         case MNOZ: return "MNOZ";
         case DZIEL: return "DZIEL";
+        case ODWROC: return "ODWROC";  // Nowy operator
+        
+        // Operator przypisania
         case NADAJ: return "NADAJ";
+        
+        // Operatory porównania
+        case ROWNE: return "ROWNE";
+        case ROZNE: return "ROZNE";
+        case WIEKSZE: return "WIEKSZE";
+        case MNIEJSZE: return "MNIEJSZE";
+        case WIEKSZE_BADZ_ROWNE: return "WIEKSZE_BADZ_ROWNE";
+        case MNIEJSZE_BADZ_ROWNE: return "MNIEJSZE_BADZ_ROWNE";
+        case I: return "I";
+        case LUB: return "LUB";
+        
+        // Instrukcje kontrolne
         case JESLI: return "JESLI";
         case POKI: return "POKI";
+        
+        // Zmienna
         case ZMIENNA: return "ZMIENNA";
+        
         default: return "???";
     }
 }

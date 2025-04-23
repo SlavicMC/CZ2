@@ -1,12 +1,12 @@
 x = 5;
 y = 7;
-jesli(12 = x + y)
+jesli(12 == x + y || y >= x)
 {
     x = x+1;
     y = y-1;
 }
 
-poki (y > 0)
+poki (y > 0 && !x)
 {
     y = y - 1;
 }
