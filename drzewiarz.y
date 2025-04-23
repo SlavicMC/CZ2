@@ -14,7 +14,7 @@ Rozgalezienie* drzewo = NULL;
 %}
 
 %union {
-    Zmienna* zmienna;
+    size_t zmienna;
     GalazPodwojna* galazPodwojna;
     Rozgalezienie* rozgalezienie;
 }
@@ -22,11 +22,13 @@ Rozgalezienie* drzewo = NULL;
 %token <zmienna> ZMIENNA
 %token JESLI POKI
 %token DODAJ ODEJMIJ MNOZ DZIEL NADAJ
+%token ROWNE ROZNE WIEKSZE MNIEJSZE WIEKSZE_BADZ_ROWNE MNIEJSZE_BADZ_ROWNE
 %token SREDNIK LNAWIAS PNAWIAS LSPIECIE PSPIECIE
 %type <rozgalezienie> wyrazenia
 %type <galazPodwojna> wyrazenie dzialanie
 
 %right NADAJ
+%left ROWNE ROZNE WIEKSZE MNIEJSZE WIEKSZE_BADZ_ROWNE MNIEJSZE_BADZ_ROWNE
 %left DODAJ ODEJMIJ
 %left MNOZ DZIEL
 
@@ -45,10 +47,10 @@ wyrazenia:
 
 wyrazenie:
       dzialanie SREDNIK                                             { $$ = $1; }
-    | JESLI LNAWIAS dzialanie PNAWIAS LSPIECIE wyrazenia PSPIECIE   { $$ = utworzWyrazenieKluczowe(JESLI, $3, $6) }
-    | JESLI LNAWIAS dzialanie PNAWIAS wyrazenie                     { $$ = utworzWyrazenieKluczowe(JESLI, $3, $5) }
-    | POKI LNAWIAS dzialanie PNAWIAS LSPIECIE wyrazenia PSPIECIE    { $$ = utworzWyrazenieKluczowe(POKI, $3, $6) }
-    | POKI LNAWIAS dzialanie PNAWIAS wyrazenie                      { $$ = utworzWyrazenieKluczowe(POKI, $3, $5) }
+    | JESLI LNAWIAS dzialanie PNAWIAS LSPIECIE wyrazenia PSPIECIE   { $$ = utworzWyrazenieKluczowe(JESLI, $3, $6); }
+    | JESLI LNAWIAS dzialanie PNAWIAS wyrazenie                     { $$ = utworzWyrazenieKluczowe(JESLI, $3, pojedynczeRozgalezienie($5)); }
+    | POKI LNAWIAS dzialanie PNAWIAS LSPIECIE wyrazenia PSPIECIE    { $$ = utworzWyrazenieKluczowe(POKI, $3, $6); }
+    | POKI LNAWIAS dzialanie PNAWIAS wyrazenie                      { $$ = utworzWyrazenieKluczowe(POKI, $3, pojedynczeRozgalezienie($5)); }
     ;
 
 dzialanie:
@@ -58,12 +60,12 @@ dzialanie:
     | dzialanie DZIEL dzialanie     { $$ = utworzDzialanie(DZIEL, $1, $3); }
     | LNAWIAS dzialanie PNAWIAS     { $$ = $2; }
     | dzialanie NADAJ dzialanie     { $$ = utworzDzialanie(NADAJ, $1, $3); }
-    | ZMIENNA                       { $$ = utworzZmienna($1); }
+    | ZMIENNA                       { $$ = utworzZmiennaJakoGalaz($1); }
     ;
 
 %%
 
-GalazPodwojna* utworzZmienna(Zmienna* z)
+GalazPodwojna* utworzZmiennaJakoGalaz(size_t z)
 {
     GalazPodwojna* galaz = malloc(sizeof(GalazPodwojna));
     if(!galaz)
@@ -87,7 +89,7 @@ Rozgalezienie* utworzRozgalezienie()
         exit(EXIT_FAILURE);
     }
     wyrazenia->rozmiar = 0;
-    wyrazenia->pojemnosc = 4;
+    wyrazenia->pojemnosc = 2;
     wyrazenia->galezie = malloc(wyrazenia->pojemnosc * sizeof(GalazPodwojna*));
     if (!wyrazenia->galezie)
     {
@@ -96,6 +98,14 @@ Rozgalezienie* utworzRozgalezienie()
     }
     return wyrazenia;
 }
+
+Rozgalezienie* pojedynczeRozgalezienie(GalazPodwojna* galaz)
+{
+    Rozgalezienie* r = utworzRozgalezienie();
+    dodajGalaz(r, galaz);
+    return r;
+}
+
 
 GalazPodwojna* utworzDzialanie(int dz, GalazPodwojna* lewy, GalazPodwojna* prawy)
 {
@@ -106,7 +116,7 @@ GalazPodwojna* utworzDzialanie(int dz, GalazPodwojna* lewy, GalazPodwojna* prawy
         exit(EXIT_FAILURE);
     }
     galaz->rodzaj = dz;
-    galaz->wartosc = NULL;
+    galaz->wartosc = 0;
     galaz->lewa = lewy;
     galaz->prawa = prawy;
     return galaz;
@@ -121,7 +131,7 @@ GalazPodwojna* utworzWyrazenieKluczowe(int dz, GalazPodwojna* lewy, Rozgalezieni
         exit(EXIT_FAILURE);
     }
     galaz->rodzaj = dz;
-    galaz->wartosc = NULL;
+    galaz->wartosc = 0;
     galaz->lewa = lewy;
     galaz->prawa = prawy;
     return galaz;
@@ -133,7 +143,7 @@ int yylex(void)
     Czastka czastka = czastki[odnosnikCzastki++];
     if(czastka.rodzaj == 0) // nieznany (nawiasy, klamry i średniki)
     {
-        yylval.zmienna = NULL;
+        yylval.zmienna = 0;
         switch (((char*)czastka.zawartosc)[0]) // nieznany to zawsze jeden bajt
         {
             case ';': return SREDNIK;
@@ -148,7 +158,7 @@ int yylex(void)
     }
     if(czastka.rodzaj == 1) // słowo kluczowe
     {
-        yylval.zmienna = NULL;
+        yylval.zmienna = 0;
         const int kluczowe[] = {JESLI, POKI};
         for(int i = 0; i < sizeof(kluczowe) / sizeof(int); i++)
         {
@@ -164,7 +174,7 @@ int yylex(void)
     }
     if(czastka.rodzaj == 3) // działanie
     {
-        yylval.zmienna = NULL;
+        yylval.zmienna = 0;
         const int dzialaniowe[] = {DODAJ, ODEJMIJ, MNOZ, DZIEL, NADAJ};
 
         for(int i = 0; i < sizeof(dzialaniowe) / sizeof(int); i++)
@@ -181,7 +191,7 @@ int yylex(void)
     }
     if(czastka.rodzaj == 2) // zmienna
     {
-        yylval.zmienna = (Zmienna*)czastka.zawartosc;
+        yylval.zmienna = czastka.zawartosc;
         return ZMIENNA;
     }
     fprintf(stderr, "Nieznany token\n");
@@ -235,4 +245,62 @@ void zetnijRozgalezienie(Rozgalezienie* rozgalezienie)
     }
     free(rozgalezienie->galezie);
     free(rozgalezienie);
+}
+
+const char* nazwaRodzaju(int rodzaj)
+{
+    switch(rodzaj)
+    {
+        case DODAJ: return "DODAJ";
+        case ODEJMIJ: return "ODEJMIJ";
+        case MNOZ: return "MNOZ";
+        case DZIEL: return "DZIEL";
+        case NADAJ: return "NADAJ";
+        case JESLI: return "JESLI";
+        case POKI: return "POKI";
+        case ZMIENNA: return "ZMIENNA";
+        default: return "???";
+    }
+}
+
+void wypiszGalaz(GalazPodwojna* galaz, int wciecie)
+{
+    if(!galaz) return;
+
+    for(int i = 0; i < wciecie; i++) printf("  ");
+
+    printf("Rodzaj: %s", nazwaRodzaju(galaz->rodzaj));
+
+    if (galaz->rodzaj == ZMIENNA)
+    {
+        printf(", Zmienna #%zu\n", galaz->wartosc);
+    }
+    else if(galaz->rodzaj == JESLI || galaz->rodzaj == POKI)
+    {
+        printf(" {\n");
+        for (int i = 0; i < wciecie + 1; i++) printf("  ");
+        printf("Warunek:\n");
+        wypiszGalaz(galaz->lewa, wciecie + 2);
+        for (int i = 0; i < wciecie + 1; i++) printf("  ");
+        printf("Spiecie:\n");
+        wypiszDrzewo((Rozgalezienie*)galaz->prawa, wciecie + 2);
+        for (int i = 0; i < wciecie; i++) printf("  ");
+        printf("}\n");
+    }
+    else
+    {
+        printf("\n");
+        wypiszGalaz(galaz->lewa, wciecie + 1);
+        wypiszGalaz(galaz->prawa, wciecie + 1);
+    }
+}
+
+void wypiszDrzewo(Rozgalezienie* rozgalezienie, int wciecie)
+{
+    if(!rozgalezienie) return;
+
+    for(size_t i = 0; i < rozgalezienie->rozmiar; i++)
+    {
+        wypiszGalaz(rozgalezienie->galezie[i], wciecie);
+    }
 }
