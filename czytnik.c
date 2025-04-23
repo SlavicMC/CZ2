@@ -472,6 +472,26 @@ size_t wczytujJakoPismo(char** wskaznik)
     return wynik;
 }
 
+size_t wczytujJakoTln(char** wskaznik)
+{
+    char* polozenie = *wskaznik;
+    size_t pozostale = koniec - polozenie;
+    if(pozostale < 3) return 0;
+    if(memcmp(polozenie, "nie", 3) == 0 && (pozostale == 3 || !isalpha(polozenie[3])))
+    {
+        *wskaznik += 3;
+        unsigned char wartosc = 0;
+        return utworzZmienna(sizeof(wartosc), 1, 4, &wartosc);
+    }
+    if(memcmp(polozenie, "tak", 3) == 0 && (pozostale == 3 || !isalpha(polozenie[3])))
+    {
+        *wskaznik += 3;
+        unsigned char wartosc = 1;
+        return utworzZmienna(sizeof(wartosc), 1, 4, &wartosc);
+    }
+    return 0;
+}
+
 size_t wczytujJakoNazwa(char** wskaznik)
 {
     char* polozenie = *wskaznik;
@@ -513,7 +533,7 @@ char* wczytujDzialania(char** wskaznik)
     return NULL;
 }
 
-size_t (*konajkiDoZmiennych[])(char**) = {wczytujJakoObszar, wczytujJakoLiczbe, wczytujJakoPismo, wczytujJakoNazwa};
+size_t (*konajkiDoZmiennych[])(char**) = {wczytujJakoObszar, wczytujJakoLiczbe, wczytujJakoPismo, wczytujJakoTln, wczytujJakoNazwa};
 
 size_t wczytujZmienne(char** wskaznik)
 {
@@ -547,7 +567,7 @@ Czastka wczytujNastepne(char** wskaznik)
     if(wynik)
     {
         Czastka c = {2, wynik};
-        printf("Wczytano zmienna: %zu\n", (size_t)wynik);
+        printf("Wczytano zmienna: %zu (rod: %s)\n", (size_t)wynik, nazwyZmiennych[zmienne[(size_t)wynik]->rod]);
         return c;
     }
     printf("Wczytano nieznany: %c\n", **wskaznik);

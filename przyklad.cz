@@ -10,3 +10,7 @@ poki (y > 0 && !x)
 {
     y = y - 1;
 }
+
+tekst = "cos tu pisze";
+warunkowa = tak;
+innawarunkowa = nie;

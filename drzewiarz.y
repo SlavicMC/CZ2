@@ -248,13 +248,14 @@ Rozgalezienie* robDrzewo(Czastka* cz, size_t l)
         getchar();
         return NULL;
     }
-    drzewo = utworzRozgalezienie();
+    drzewo = NULL;
+    /*drzewo = utworzRozgalezienie();
     if (!drzewo)
     {
         fprintf(stderr, "Nie udalo sie zrobic drzewa\n");
         getchar();
         return NULL;
-    }
+    }*/
     printf("Rozpoczynamy?");
     getchar();
     int result = yyparse();
