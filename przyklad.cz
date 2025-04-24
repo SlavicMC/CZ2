@@ -6,11 +6,11 @@ jesli(12 == x + y || y >= x)
     y = y-1;
 }
 
-poki (y > 0 && !x)
-{
-    y = y - 1;
-}
-
 tekst = "cos tu pisze";
 warunkowa = tak;
 innawarunkowa = nie;
+
+poki (y > 0 && !innawarunkowa)
+{
+    y = y - 1;
+}

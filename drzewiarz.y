@@ -21,8 +21,8 @@ Rozgalezienie* drzewo = NULL;
 
 %token <zmienna> ZMIENNA
 %token JESLI POKI
-%token DODAJ ODEJMIJ MNOZ DZIEL NADAJ
-%token ODWROC ROWNE ROZNE WIEKSZE MNIEJSZE WIEKSZE_BADZ_ROWNE MNIEJSZE_BADZ_ROWNE
+%token DODAJ ODEJMIJ MNOZ DZIEL RESZTA NADAJ
+%token NIE ROWNE ROZNE WIEKSZE MNIEJSZE WIEKSZE_BADZ_ROWNE MNIEJSZE_BADZ_ROWNE
 %token I LUB
 %token SREDNIK LNAWIAS PNAWIAS LSPIECIE PSPIECIE
 %type <rozgalezienie> wyrazenia
@@ -32,8 +32,8 @@ Rozgalezienie* drzewo = NULL;
 %left I LUB
 %left ROWNE ROZNE WIEKSZE MNIEJSZE WIEKSZE_BADZ_ROWNE MNIEJSZE_BADZ_ROWNE
 %left DODAJ ODEJMIJ
-%left MNOZ DZIEL
-%left ODWROC
+%left MNOZ DZIEL RESZTA
+%left NIE
 
 %start calosc
 
@@ -62,7 +62,8 @@ dzialanie:
     | dzialanie ODEJMIJ dzialanie               { $$ = utworzDzialanie(ODEJMIJ, $1, $3); }
     | dzialanie MNOZ dzialanie                  { $$ = utworzDzialanie(MNOZ, $1, $3); }
     | dzialanie DZIEL dzialanie                 { $$ = utworzDzialanie(DZIEL, $1, $3); }
-    | ODWROC dzialanie                          { $$ = utworzDzialanie(ODWROC, $2, NULL); }
+    | dzialanie RESZTA dzialanie                { $$ = utworzDzialanie(RESZTA, $1, $3); }
+    | NIE dzialanie                             { $$ = utworzDzialanie(NIE, $2, NULL); }
     | dzialanie ROWNE dzialanie                 { $$ = utworzDzialanie(ROWNE, $1, $3); }
     | dzialanie ROZNE dzialanie                 { $$ = utworzDzialanie(ROZNE, $1, $3); }
     | dzialanie WIEKSZE dzialanie               { $$ = utworzDzialanie(WIEKSZE, $1, $3); }
@@ -197,8 +198,8 @@ int yylex(void)
     if(czastka.rodzaj == 3) // działanie
     {
         yylval.zmienna = 0;
-        // char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+", "-", "*", "/", "=", "!", ">", "<"};
-        const int dzialaniowe[] = {ROWNE, ROZNE, WIEKSZE_BADZ_ROWNE, MNIEJSZE_BADZ_ROWNE, LUB, I, DODAJ, ODEJMIJ, MNOZ, DZIEL, NADAJ, ODWROC, WIEKSZE, MNIEJSZE};
+        // char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+", "-", "*", "/", "%", "=", "!", ">", "<"};
+        const int dzialaniowe[] = {ROWNE, ROZNE, WIEKSZE_BADZ_ROWNE, MNIEJSZE_BADZ_ROWNE, LUB, I, DODAJ, ODEJMIJ, MNOZ, DZIEL, RESZTA, NADAJ, NIE, WIEKSZE, MNIEJSZE};
 
         for(int i = 0; i < sizeof(dzialaniowe) / sizeof(int); i++)
         {
@@ -310,7 +311,8 @@ const char* nazwaRodzaju(int rodzaj) {
         case ODEJMIJ: return "ODEJMIJ";
         case MNOZ: return "MNOZ";
         case DZIEL: return "DZIEL";
-        case ODWROC: return "ODWROC";  // Nowy operator
+        case RESZTA: return "RESZTA";
+        case NIE: return "NIE";
         
         // Operator przypisania
         case NADAJ: return "NADAJ";

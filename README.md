@@ -1,20 +1,125 @@
-# Autorzy:
-Maciej Cieżak, Seweryn Fronc
+# Dokumentacja języka programowania CZ
 
-# Pliki repozytorium:
-- `czytnik.c` - główny program języka, podaje się mu plik w formie kodu źródłowego (.cz) lub kodu wykonywalnego (.czp)
-- `drzewiarz.y` - kod parsera uruchamiany przez funkcję `robDrzewo()`, korzystać z tego ma `czytnik.c`
-- `dzielone.h` - deklaracje przekazywane między `czytnik.c` a drzewiarz.y
+---
 
-Pozostałe pliki to nieistotne notatki i pomoce.
+## Autorzy
 
-# Opis działania:
-`czytnik.c` otrzymuje plik z kodem i w zależności od formatu rozróżnia co z nim zrobić. Na starcie przygotowuje podstawowe zmienne oraz na bazie podstawowej zmiennej `obszar` tworzy oraz wykonuje kod który w zależności od formatu przetłumaczy i przeczyta podany kod źródłowy (.cz) lub przeczyta kod wykonywalny (.czp). Zmienne są wczytywane za pomocą indywidualnych funkcji 
+- Maciej Cieżak - mciezak@student.agh.edu.pl
+- Seweryn Fronc - sfronc@student.agh.edu.pl
 
-# Rodzaje zmiennych:
-- `obszar` - (obs) połączenie klasy, funkcji i obiektu w jedno. Może przechowywać zmienne i kod wykonywalny. Cały kod źródłowy wczytywany jest jako duży obszar i funkcja wczytująca obszary odpowiedzialna jest za przetłumaczenie go (przy użyciu `drzewiarz.y`). Kluczowa zmienna języka;
-- `liczba` - (lic) liczba całkowita o dowolnej precyzji. Używa biblioteki GMP;
-- `pismo` - (pis) zmienna tekstowa;
-- `tak-lub-nie` - (tln) boolean. W założeniu będzie mógł przechowywać 8 wartości na bajt (pozyskiwane jak z tablicy);
+---
 
-Wszystkie zmienne w języku korzystają z tej samej struktury C i są wektorami.
+## Założenia programu
+
+### Ogólne cele
+
+Stworzenie prostego polskiego języka programowania z bytecodem
+
+### Rodzaj translatora
+
+**Interpreter**
+
+### Planowany wynik działania programu
+
+**Kompilacja kodu CZ na CZP i/lub interpretacja CZP**
+
+### Język implementacji
+
+**C**
+
+### Realizacja
+
+- **Skaner - własny**
+- **Parser - Yacc**
+
+---
+
+## Tabela tokenów
+
+### Domyślne rodzaje danych
+
+| Ród           | Opis                     |
+|---------------|--------------------------|
+| `obs`         | obszar (funkcja/obiekt)  |
+| `lic`         | liczba całkowita         |
+| `pis`         | ciąg znaków              |
+| `tln`         | boolean                  |
+| `nck`         | liczba niecałkowita      |
+| `cig`         | ciąg zmiennych (wektor)  |
+
+Należy zaznaczyć, że:
+- ród to odnośnik na bezobszarową zmienną tworzoną na początku która zawiera przypięte ma metody zarządzające rodem
+- ze względu na dynamiczny charakter języka parser nie rozpoznaje rodów zmiennych
+- takie podejście umożliwia proste tworzenie własnych rodzajów danych poprzez utworzenie zmiennej rodowej i zdefiniowanie jej funkcji
+
+
+### Działania
+
+| Token                 | Opis                    | Przykład |
+|-----------------------|-------------------------|----------|
+| `DODAJ`               | dodawanie               | `+`      |
+| `ODEJMIJ`             | odejmowanie             | `-`      |
+| `MNOZ`                | mnożenie                | `*`      |
+| `DZIEL`               | dzielenie               | `/`      |
+| `RESZTA`              | reszta z dzielenia      | `%`      |
+| `POTEGA`              | potęgowanie             | `**`     |
+| `ZWIEKSZ`             | inkrementacja           | `++`     |
+| `ZMNIEJSZ`            | dekrementacja           | `--`     |
+| `ROWNE`               | równe                   | `==`     |
+| `ROZNE`               | nierówne                | `!=`     |
+| `MNIEJSZE`            | mniejsze                | `<`      |
+| `MNIEJSZE_BADZ_ROWNE` | mniejsze bądź równe     | `<=`     |
+| `WIEKSZE`             | większe                 | `>`      |
+| `WIEKSZE_BADZ_ROWNE`  | większe bądź równe      | `>=`     |
+| `I`                   | operator logiczny "AND" | `&&`     |
+| `LUB`                 | operator logiczny "OR"  | `\|\|`   |
+| `NIE`                 | operator logiczny "NOT" | `!`      |
+| `NADAJ`               | przypisanie             | `=`      |
+| `DODAJ_NADAJ`         | przypisanie dodawania   | `+=`     |
+| `ODEJMIJ_NADAJ`       | przypisanie odejmowania | `-=`     |
+| `MNOZ_NADAJ`          | przypisanie mnożenia    | `*=`     |
+| `DZIEL_NADAJ`         | przypisanie dzielenia   | `/=`     |
+| `RESZTA_NADAJ`        | przypisanie reszty      | `%=`     |
+
+Możliwe że język będzie miał możliwość dodawania własnych działań
+
+
+### Inne znaki
+
+| Token           | Opis                          | Przykład |
+|-----------------|-------------------------------|----------|
+| `LNAWIAS`       | nawias otwierający            | `(`      |
+| `PNAWIAS`       | nawias zamykający             | `)`      |
+| `LLUBIANKA`     | nawias kwadratowy otwierający | `[`      |
+| `PLUBIANKA`     | nawias kwadratowy zamykający  | `]`      |
+| `LSPIECIE`      | nawias klamrowy otwierający   | `{`      |
+| `PSPIECIE`      | nawias klamrowy zamykający    | `}`      |
+| `SREDNIK`       | średnik                       | `;`      |
+
+
+### Słowa kluczowe
+
+| Token          | Opis                              | Przykład       |
+|----------------|-----------------------------------|----------------|
+| `JESLI`        | wyrażenie jeśli                   | `jesli`        |
+| `IJESLI`       | wyrażenie w przeciwnym razie jeśli| `inaczej jesli`|
+| `INACZEJ`      | wyrażenie w przeciwnym razie      | `inaczej`      |
+| `POKI`         | wyrażenie póki                    | `poki`         |
+| `POTY`         | wyrażenie póty (razem z póki)     | `poty`         |
+
+
+### Inne tokeny
+
+| Token        | Opis                    | Przykład                 |
+|--------------|-------------------------|--------------------------|
+| `###`        | koniec obszaru głównego | `###`                    |
+
+---
+
+## Gramatyka
+
+[Gramatyka](./drzewiarz.y)
+
+## Przykładowy kod źródłowy
+
+[Przykład](./przyklad.cz)

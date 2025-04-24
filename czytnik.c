@@ -32,7 +32,7 @@ size_t* wskaznikOdnosnikaPolecenia;
 char* poczet;
 
 char* slowaKluczowe[] = {"###", "jesli", "poki"};
-char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+", "-", "*", "/", "=", "!", ">", "<"}; // działania idą w kolejności malejącej długości (najpierw sprawdzamy najdłuższe)
+char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+", "-", "*", "/", "%", "=", "!", ">", "<"}; // działania idą w kolejności malejącej długości (najpierw sprawdzamy najdłuższe)
 
 char* nazwyPolecen[] = {"tlumacz", "czytaj"};
 size_t liczbaPolecen = 0;
