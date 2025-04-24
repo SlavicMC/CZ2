@@ -75,11 +75,11 @@ Należy zaznaczyć, że:
 | `LUB`                 | operator logiczny "OR"  | `\|\|`   |
 | `NIE`                 | operator logiczny "NOT" | `!`      |
 | `NADAJ`               | przypisanie             | `=`      |
-| `DODAJ_NADAJ`         | przypisanie dodawania   | `+=`     |
-| `ODEJMIJ_NADAJ`       | przypisanie odejmowania | `-=`     |
-| `MNOZ_NADAJ`          | przypisanie mnożenia    | `*=`     |
-| `DZIEL_NADAJ`         | przypisanie dzielenia   | `/=`     |
-| `RESZTA_NADAJ`        | przypisanie reszty      | `%=`     |
+| `NDODAJ`              | przypisanie dodawania   | `+=`     |
+| `NODEJMIJ`            | przypisanie odejmowania | `-=`     |
+| `NMNOZ`               | przypisanie mnożenia    | `*=`     |
+| `NDZIEL`              | przypisanie dzielenia   | `/=`     |
+| `NRESZTA`             | przypisanie reszty      | `%=`     |
 
 Możliwe że język będzie miał możliwość dodawania własnych działań
 

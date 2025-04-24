@@ -32,7 +32,7 @@ size_t* wskaznikOdnosnikaPolecenia;
 char* poczet;
 
 char* slowaKluczowe[] = {"###", "jesli", "poki"};
-char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+", "-", "*", "/", "%", "=", "!", ">", "<"}; // działania idą w kolejności malejącej długości (najpierw sprawdzamy najdłuższe)
+char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+=", "-=", "*=", "/=", "%=", "+", "-", "*", "/", "%", "=", "!", ">", "<"}; // działania idą w kolejności malejącej długości (najpierw sprawdzamy najdłuższe)
 
 char* nazwyPolecen[] = {"tlumacz", "czytaj"};
 size_t liczbaPolecen = 0;
@@ -278,10 +278,8 @@ size_t wczytujJakoObszarGlowny(char** wskaznik)
         if(polozenie >= koniec)
         {
             *wskaznik = polozenie;
-            printf("Wyjebalo sie X_X\n");
             break;
         }
-        printf("Zapierdalam\n");
         Czastka c = wczytujNastepne(&polozenie);
         if(c.rodzaj == 1 && (char*)c.zawartosc == slowaKluczowe[0]) break; // kończymy jeśli napotkamy ###
         if(rozmiarCzastekObszaru >= pojemnoscCzastekObszaru)
@@ -635,7 +633,7 @@ int main(int argc, char *argv[])
     while(TRUE)
     {
         polecenia[poczet[++(*wskaznikOdnosnikaPolecenia)-1]]();
-        printf("Powrot do petli w main");
+        printf("Powrot do petli w main\n");
     }
 
     getchar();

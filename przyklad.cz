@@ -2,8 +2,8 @@ x = 5;
 y = 7;
 jesli(12 == x + y || y >= x)
 {
-    x = x+1;
-    y = y-1;
+    x += 1;
+    y -= 1;
 }
 
 tekst = "cos tu pisze";
@@ -12,5 +12,5 @@ innawarunkowa = nie;
 
 poki (y > 0 && !innawarunkowa)
 {
-    y = y - 1;
+    y *= 1;
 }

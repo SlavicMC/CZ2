@@ -61,21 +61,27 @@ extern int yydebug;
     ODEJMIJ = 262,                 /* ODEJMIJ  */
     MNOZ = 263,                    /* MNOZ  */
     DZIEL = 264,                   /* DZIEL  */
-    NADAJ = 265,                   /* NADAJ  */
-    ODWROC = 266,                  /* ODWROC  */
-    ROWNE = 267,                   /* ROWNE  */
-    ROZNE = 268,                   /* ROZNE  */
-    WIEKSZE = 269,                 /* WIEKSZE  */
-    MNIEJSZE = 270,                /* MNIEJSZE  */
-    WIEKSZE_BADZ_ROWNE = 271,      /* WIEKSZE_BADZ_ROWNE  */
-    MNIEJSZE_BADZ_ROWNE = 272,     /* MNIEJSZE_BADZ_ROWNE  */
-    I = 273,                       /* I  */
-    LUB = 274,                     /* LUB  */
-    SREDNIK = 275,                 /* SREDNIK  */
-    LNAWIAS = 276,                 /* LNAWIAS  */
-    PNAWIAS = 277,                 /* PNAWIAS  */
-    LSPIECIE = 278,                /* LSPIECIE  */
-    PSPIECIE = 279                 /* PSPIECIE  */
+    RESZTA = 265,                  /* RESZTA  */
+    NADAJ = 266,                   /* NADAJ  */
+    NDODAJ = 267,                  /* NDODAJ  */
+    NODEJMIJ = 268,                /* NODEJMIJ  */
+    NMNOZ = 269,                   /* NMNOZ  */
+    NDZIEL = 270,                  /* NDZIEL  */
+    NRESZTA = 271,                 /* NRESZTA  */
+    NIE = 272,                     /* NIE  */
+    ROWNE = 273,                   /* ROWNE  */
+    ROZNE = 274,                   /* ROZNE  */
+    WIEKSZE = 275,                 /* WIEKSZE  */
+    MNIEJSZE = 276,                /* MNIEJSZE  */
+    WIEKSZE_BADZ_ROWNE = 277,      /* WIEKSZE_BADZ_ROWNE  */
+    MNIEJSZE_BADZ_ROWNE = 278,     /* MNIEJSZE_BADZ_ROWNE  */
+    I = 279,                       /* I  */
+    LUB = 280,                     /* LUB  */
+    SREDNIK = 281,                 /* SREDNIK  */
+    LNAWIAS = 282,                 /* LNAWIAS  */
+    PNAWIAS = 283,                 /* PNAWIAS  */
+    LSPIECIE = 284,                /* LSPIECIE  */
+    PSPIECIE = 285                 /* PSPIECIE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -90,7 +96,7 @@ union YYSTYPE
     GalazPodwojna* galazPodwojna;
     Rozgalezienie* rozgalezienie;
 
-#line 94 "drzewiarz.tab.h"
+#line 100 "drzewiarz.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
