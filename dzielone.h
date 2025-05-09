@@ -1,6 +1,10 @@
 #ifndef DZIELONE_H
 #define DZIELONE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,41 +12,16 @@
 #include <ctype.h>
 #include <gmp.h>
 
-typedef struct
-{
-    size_t rozmiar;                     // liczba bytów używana przez zawartość
-    size_t rod;                         // ród, wskazuje na inną zmienną która jest zmienną rodową lub na siebie jeśli sama nią jest
-    size_t cechy;                       // liczba cech (zmiennych przypisanych do tej zmiennej)
-    size_t pojemnosc;                   // ilość przypisanej pamięci
-} Zmienna;
-
-typedef struct {
-    size_t odnosnik;
-    char* nazwa;
-} OdnosnikZmiennejINazwa;
-
-typedef struct
-{
-    unsigned char rodzaj;               // 0 - nieznany, 1 - słowo kluczowe, 2 - zmienna, 3 - działanie
-    uintptr_t zawartosc;                // wskaźnik lub odnośnik do danych
-} Czastka;
-
-typedef struct
-{
-    int rodzaj;
-    size_t wartosc;
-    void* lewa;
-    void* prawa;
-} GalazPodwojna;
-
-typedef struct {
-    size_t rozmiar;
-    size_t pojemnosc;
-    GalazPodwojna** galezie;
-} Rozgalezienie;
+#include "powszechne.h"
 
 extern char* slowaKluczowe[];
+extern size_t liczbaSlowKluczowych;
 extern char* dzialania[];
+extern size_t liczbaDzialan;
+
+extern int zmienniana;
+extern int kluczowe[];
+extern int dzialaniowe[];
 
 Rozgalezienie* robDrzewo(Czastka* cz, size_t l);
 void zetnijGalaz(GalazPodwojna* galaz);
@@ -59,5 +38,9 @@ void wypiszDrzewo(Rozgalezienie* rozgalezienie, int wciecie);
 GalazPodwojna* utworzDzialanie(int dz, GalazPodwojna* lewy, GalazPodwojna* prawy);
 GalazPodwojna* utworzWyrazenieKluczowe(int dz, GalazPodwojna* lewy, Rozgalezienie* prawy);
 GalazPodwojna* utworzZmiennaJakoGalaz(size_t z);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

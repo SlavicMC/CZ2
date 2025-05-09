@@ -1,0 +1,3 @@
+cd "C:\Users\_USER_\Desktop\CZ2"
+bison -d drzewiarz.y
+gcc czytnik.c drzewiarz.tab.c -o cezak.exe -lgmp

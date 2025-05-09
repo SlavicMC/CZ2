@@ -48,7 +48,7 @@ Stworzenie prostego polskiego języka programowania z bytecodem
 | `cig`         | ciąg zmiennych (wektor)  |
 
 Należy zaznaczyć, że:
-- ród to odnośnik na bezobszarową zmienną tworzoną na początku która zawiera przypięte ma metody zarządzające rodem
+- ród to odnośnik na bezobszarową zmienną tworzoną na początku która ma przypięte metody zarządzające rodem
 - ze względu na dynamiczny charakter języka parser nie rozpoznaje rodów zmiennych
 - takie podejście umożliwia proste tworzenie własnych rodzajów danych poprzez utworzenie zmiennej rodowej i zdefiniowanie jej funkcji
 

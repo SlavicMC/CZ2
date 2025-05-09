@@ -1,5 +1,6 @@
 %{
 #include "dzielone.h"
+#include "powszechne.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -84,6 +85,13 @@ dzialanie:
 
 %%
 
+int zmienniana = ZMIENNA;
+int kluczowe[] = { 0, JESLI, POKI};
+size_t liczbaSlowKluczowych = sizeof(kluczowe)/sizeof(kluczowe[0]);
+// char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+=", "-=", "*=", "/=", "%=", "+", "-", "*", "/", "%", "=", "!", ">", "<"};
+int dzialaniowe[] = {ROWNE, ROZNE, WIEKSZE_BADZ_ROWNE, MNIEJSZE_BADZ_ROWNE, LUB, I, NDODAJ, NODEJMIJ, NMNOZ, NDZIEL, NRESZTA, DODAJ, ODEJMIJ, MNOZ, DZIEL, RESZTA, NADAJ, NIE, WIEKSZE, MNIEJSZE};
+size_t liczbaDzialan = sizeof(dzialaniowe)/sizeof(dzialaniowe[0]);
+
 GalazPodwojna* utworzZmiennaJakoGalaz(size_t z)
 {
     GalazPodwojna* galaz = malloc(sizeof(GalazPodwojna));
@@ -158,14 +166,14 @@ GalazPodwojna* utworzWyrazenieKluczowe(int dz, GalazPodwojna* lewy, Rozgalezieni
 
 int yylex(void)
 {
-    printf("yylex rusza!\n");
+    //printf("yylex rusza!\n");
     if(odnosnikCzastki >= liczbaCzastek) return 0;
     Czastka czastka = czastki[odnosnikCzastki++];
     if(czastka.rodzaj == 0) // nieznany (nawiasy, klamry i średniki)
     {
         yylval.zmienna = 0;
-        printf("Wyslano nieznany: %c\n", ((char*)czastka.zawartosc)[0]);
-        getchar();
+        //printf("Wyslano nieznany: %c\n", ((char*)czastka.zawartosc)[0]);
+        //getchar();
         switch (((char*)czastka.zawartosc)[0]) // nieznany to zawsze jeden bajt
         {
             case ';': return SREDNIK;
@@ -182,13 +190,12 @@ int yylex(void)
     if(czastka.rodzaj == 1) // słowo kluczowe
     {
         yylval.zmienna = 0;
-        const int kluczowe[] = { 0, JESLI, POKI};
         for(int i = 1; i < sizeof(kluczowe) / sizeof(int); i++)
         {
             if((char*)czastka.zawartosc == slowaKluczowe[i]) 
             {
-                printf("Wyslano kluczowe: %s\n", slowaKluczowe[i]);
-                getchar();
+                //printf("Wyslano kluczowe: %s\n", slowaKluczowe[i]);
+                //getchar();
                 return kluczowe[i]; // porównywanie wskaźników a nie stringów
             }
         }
@@ -204,15 +211,13 @@ int yylex(void)
     if(czastka.rodzaj == 3) // działanie
     {
         yylval.zmienna = 0;
-        // char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+=", "-=", "*=", "/=", "%=", "+", "-", "*", "/", "%", "=", "!", ">", "<"};
-        const int dzialaniowe[] = {ROWNE, ROZNE, WIEKSZE_BADZ_ROWNE, MNIEJSZE_BADZ_ROWNE, LUB, I, NDODAJ, NODEJMIJ, NMNOZ, NDZIEL, NRESZTA, DODAJ, ODEJMIJ, MNOZ, DZIEL, RESZTA, NADAJ, NIE, WIEKSZE, MNIEJSZE};
 
         for(int i = 0; i < sizeof(dzialaniowe) / sizeof(int); i++)
         {
             if((char*)czastka.zawartosc == dzialania[i]) 
             {
-                printf("Wyslano dzialanie: %s\n", dzialania[i]);
-                getchar();
+                //printf("Wyslano dzialanie: %s\n", dzialania[i]);
+                //getchar();
                 return dzialaniowe[i]; // porównywanie wskaźników a nie stringów
             }
         }
@@ -228,8 +233,8 @@ int yylex(void)
     if(czastka.rodzaj == 2) // zmienna
     {
         yylval.zmienna = czastka.zawartosc;
-        printf("Wyslano zmienna: %zu\n", (size_t)czastka.zawartosc);
-        getchar();
+        //printf("Wyslano zmienna: %zu\n", (size_t)czastka.zawartosc);
+        //getchar();
         return ZMIENNA;
     }
     fprintf(stderr, "Nieznany token\n");
@@ -256,13 +261,6 @@ Rozgalezienie* robDrzewo(Czastka* cz, size_t l)
         return NULL;
     }
     drzewo = NULL;
-    /*drzewo = utworzRozgalezienie();
-    if (!drzewo)
-    {
-        fprintf(stderr, "Nie udalo sie zrobic drzewa\n");
-        getchar();
-        return NULL;
-    }*/
     printf("Rozpoczynamy?");
     getchar();
     int result = yyparse();
@@ -310,43 +308,18 @@ void zetnijRozgalezienie(Rozgalezienie* rozgalezienie)
     free(rozgalezienie);
 }
 
-const char* nazwaRodzaju(int rodzaj) {
-    switch(rodzaj) {
-        // Operatory arytmetyczne
-        case DODAJ: return "DODAJ";
-        case ODEJMIJ: return "ODEJMIJ";
-        case MNOZ: return "MNOZ";
-        case DZIEL: return "DZIEL";
-        case RESZTA: return "RESZTA";
-        case NIE: return "NIE";
-        
-        // Operator przypisania
-        case NADAJ: return "NADAJ";
-        case NDODAJ: return "NDODAJ";
-        case NODEJMIJ: return "NODEJMIJ";
-        case NMNOZ: return "NMNOZ";
-        case NDZIEL: return "NDZIEL";
-        case NRESZTA: return "NRESZTA";
-        
-        // Operatory porównania
-        case ROWNE: return "ROWNE";
-        case ROZNE: return "ROZNE";
-        case WIEKSZE: return "WIEKSZE";
-        case MNIEJSZE: return "MNIEJSZE";
-        case WIEKSZE_BADZ_ROWNE: return "WIEKSZE_BADZ_ROWNE";
-        case MNIEJSZE_BADZ_ROWNE: return "MNIEJSZE_BADZ_ROWNE";
-        case I: return "I";
-        case LUB: return "LUB";
-        
-        // Instrukcje kontrolne
-        case JESLI: return "JESLI";
-        case POKI: return "POKI";
-        
-        // Zmienna
-        case ZMIENNA: return "ZMIENNA";
-        
-        default: return "???";
+const char* nazwaRodzaju(int rodzaj)
+{
+    if(rodzaj == ZMIENNA) return "ZMIENNA";
+    for(size_t i = 0; i < sizeof(dzialaniowe)/sizeof(dzialaniowe[0]); i++)
+    {
+        if(dzialaniowe[i] == rodzaj) return dzialania[i];
     }
+    for(size_t i = 0; i < sizeof(kluczowe)/sizeof(kluczowe[0]); i++)
+    {
+        if(kluczowe[i] == rodzaj) return slowaKluczowe[i];
+    }
+    return "???";
 }
 
 void wypiszGalaz(GalazPodwojna* galaz, int wciecie)
