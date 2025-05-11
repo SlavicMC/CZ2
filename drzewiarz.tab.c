@@ -70,6 +70,7 @@
 #line 1 "drzewiarz.y"
 
 #include "dzielone.h"
+#include "powszechne.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -82,7 +83,7 @@ size_t liczbaCzastek;
 Rozgalezienie* drzewo = NULL;
 
 
-#line 86 "drzewiarz.tab.c"
+#line 87 "drzewiarz.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -534,10 +535,10 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    44,    44,    48,    49,    53,    54,    55,    56,    57,
-      61,    62,    63,    64,    65,    66,    67,    68,    69,    70,
-      71,    72,    73,    74,    75,    76,    77,    78,    79,    80,
-      81,    82
+       0,    45,    45,    49,    50,    54,    55,    56,    57,    58,
+      62,    63,    64,    65,    66,    67,    68,    69,    70,    71,
+      72,    73,    74,    75,    76,    77,    78,    79,    80,    81,
+      82,    83
 };
 #endif
 
@@ -1164,187 +1165,187 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* calosc: wyrazenia  */
-#line 44 "drzewiarz.y"
+#line 45 "drzewiarz.y"
                 { drzewo = (yyvsp[0].rozgalezienie); }
-#line 1170 "drzewiarz.tab.c"
+#line 1171 "drzewiarz.tab.c"
     break;
 
   case 3: /* wyrazenia: %empty  */
-#line 48 "drzewiarz.y"
+#line 49 "drzewiarz.y"
                             { (yyval.rozgalezienie) = utworzRozgalezienie(); }
-#line 1176 "drzewiarz.tab.c"
+#line 1177 "drzewiarz.tab.c"
     break;
 
   case 4: /* wyrazenia: wyrazenia wyrazenie  */
-#line 49 "drzewiarz.y"
+#line 50 "drzewiarz.y"
                             { dodajGalaz((yyvsp[-1].rozgalezienie), (yyvsp[0].galazPodwojna)); (yyval.rozgalezienie) = (yyvsp[-1].rozgalezienie); }
-#line 1182 "drzewiarz.tab.c"
+#line 1183 "drzewiarz.tab.c"
     break;
 
   case 5: /* wyrazenie: dzialanie SREDNIK  */
-#line 53 "drzewiarz.y"
+#line 54 "drzewiarz.y"
                                                                     { (yyval.galazPodwojna) = (yyvsp[-1].galazPodwojna); }
-#line 1188 "drzewiarz.tab.c"
+#line 1189 "drzewiarz.tab.c"
     break;
 
   case 6: /* wyrazenie: JESLI LNAWIAS dzialanie PNAWIAS LSPIECIE wyrazenia PSPIECIE  */
-#line 54 "drzewiarz.y"
+#line 55 "drzewiarz.y"
                                                                     { (yyval.galazPodwojna) = utworzWyrazenieKluczowe(JESLI, (yyvsp[-4].galazPodwojna), (yyvsp[-1].rozgalezienie)); }
-#line 1194 "drzewiarz.tab.c"
+#line 1195 "drzewiarz.tab.c"
     break;
 
   case 7: /* wyrazenie: JESLI LNAWIAS dzialanie PNAWIAS wyrazenie  */
-#line 55 "drzewiarz.y"
+#line 56 "drzewiarz.y"
                                                                     { (yyval.galazPodwojna) = utworzWyrazenieKluczowe(JESLI, (yyvsp[-2].galazPodwojna), pojedynczeRozgalezienie((yyvsp[0].galazPodwojna))); }
-#line 1200 "drzewiarz.tab.c"
+#line 1201 "drzewiarz.tab.c"
     break;
 
   case 8: /* wyrazenie: POKI LNAWIAS dzialanie PNAWIAS LSPIECIE wyrazenia PSPIECIE  */
-#line 56 "drzewiarz.y"
+#line 57 "drzewiarz.y"
                                                                     { (yyval.galazPodwojna) = utworzWyrazenieKluczowe(POKI, (yyvsp[-4].galazPodwojna), (yyvsp[-1].rozgalezienie)); }
-#line 1206 "drzewiarz.tab.c"
+#line 1207 "drzewiarz.tab.c"
     break;
 
   case 9: /* wyrazenie: POKI LNAWIAS dzialanie PNAWIAS wyrazenie  */
-#line 57 "drzewiarz.y"
+#line 58 "drzewiarz.y"
                                                                     { (yyval.galazPodwojna) = utworzWyrazenieKluczowe(POKI, (yyvsp[-2].galazPodwojna), pojedynczeRozgalezienie((yyvsp[0].galazPodwojna))); }
-#line 1212 "drzewiarz.tab.c"
+#line 1213 "drzewiarz.tab.c"
     break;
 
   case 10: /* dzialanie: dzialanie NADAJ dzialanie  */
-#line 61 "drzewiarz.y"
+#line 62 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = utworzDzialanie(NADAJ, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1218 "drzewiarz.tab.c"
+#line 1219 "drzewiarz.tab.c"
     break;
 
   case 11: /* dzialanie: dzialanie NDODAJ dzialanie  */
-#line 62 "drzewiarz.y"
+#line 63 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = utworzDzialanie(NDODAJ, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1224 "drzewiarz.tab.c"
+#line 1225 "drzewiarz.tab.c"
     break;
 
   case 12: /* dzialanie: dzialanie NODEJMIJ dzialanie  */
-#line 63 "drzewiarz.y"
+#line 64 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = utworzDzialanie(NODEJMIJ, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1230 "drzewiarz.tab.c"
+#line 1231 "drzewiarz.tab.c"
     break;
 
   case 13: /* dzialanie: dzialanie NMNOZ dzialanie  */
-#line 64 "drzewiarz.y"
+#line 65 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = utworzDzialanie(NMNOZ, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1236 "drzewiarz.tab.c"
+#line 1237 "drzewiarz.tab.c"
     break;
 
   case 14: /* dzialanie: dzialanie NDZIEL dzialanie  */
-#line 65 "drzewiarz.y"
+#line 66 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = utworzDzialanie(NDZIEL, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1242 "drzewiarz.tab.c"
+#line 1243 "drzewiarz.tab.c"
     break;
 
   case 15: /* dzialanie: dzialanie NRESZTA dzialanie  */
-#line 66 "drzewiarz.y"
+#line 67 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = utworzDzialanie(NRESZTA, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1248 "drzewiarz.tab.c"
+#line 1249 "drzewiarz.tab.c"
     break;
 
   case 16: /* dzialanie: dzialanie DODAJ dzialanie  */
-#line 67 "drzewiarz.y"
+#line 68 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = utworzDzialanie(DODAJ, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1254 "drzewiarz.tab.c"
+#line 1255 "drzewiarz.tab.c"
     break;
 
   case 17: /* dzialanie: dzialanie ODEJMIJ dzialanie  */
-#line 68 "drzewiarz.y"
+#line 69 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = utworzDzialanie(ODEJMIJ, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1260 "drzewiarz.tab.c"
+#line 1261 "drzewiarz.tab.c"
     break;
 
   case 18: /* dzialanie: dzialanie MNOZ dzialanie  */
-#line 69 "drzewiarz.y"
+#line 70 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = utworzDzialanie(MNOZ, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1266 "drzewiarz.tab.c"
+#line 1267 "drzewiarz.tab.c"
     break;
 
   case 19: /* dzialanie: dzialanie DZIEL dzialanie  */
-#line 70 "drzewiarz.y"
+#line 71 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = utworzDzialanie(DZIEL, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1272 "drzewiarz.tab.c"
+#line 1273 "drzewiarz.tab.c"
     break;
 
   case 20: /* dzialanie: dzialanie RESZTA dzialanie  */
-#line 71 "drzewiarz.y"
+#line 72 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = utworzDzialanie(RESZTA, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1278 "drzewiarz.tab.c"
+#line 1279 "drzewiarz.tab.c"
     break;
 
   case 21: /* dzialanie: NIE dzialanie  */
-#line 72 "drzewiarz.y"
+#line 73 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = utworzDzialanie(NIE, (yyvsp[0].galazPodwojna), NULL); }
-#line 1284 "drzewiarz.tab.c"
+#line 1285 "drzewiarz.tab.c"
     break;
 
   case 22: /* dzialanie: dzialanie ROWNE dzialanie  */
-#line 73 "drzewiarz.y"
+#line 74 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = utworzDzialanie(ROWNE, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1290 "drzewiarz.tab.c"
+#line 1291 "drzewiarz.tab.c"
     break;
 
   case 23: /* dzialanie: dzialanie ROZNE dzialanie  */
-#line 74 "drzewiarz.y"
+#line 75 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = utworzDzialanie(ROZNE, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1296 "drzewiarz.tab.c"
+#line 1297 "drzewiarz.tab.c"
     break;
 
   case 24: /* dzialanie: dzialanie WIEKSZE dzialanie  */
-#line 75 "drzewiarz.y"
+#line 76 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = utworzDzialanie(WIEKSZE, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1302 "drzewiarz.tab.c"
+#line 1303 "drzewiarz.tab.c"
     break;
 
   case 25: /* dzialanie: dzialanie MNIEJSZE dzialanie  */
-#line 76 "drzewiarz.y"
+#line 77 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = utworzDzialanie(MNIEJSZE, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1308 "drzewiarz.tab.c"
+#line 1309 "drzewiarz.tab.c"
     break;
 
   case 26: /* dzialanie: dzialanie WIEKSZE_BADZ_ROWNE dzialanie  */
-#line 77 "drzewiarz.y"
+#line 78 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = utworzDzialanie(WIEKSZE_BADZ_ROWNE, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1314 "drzewiarz.tab.c"
+#line 1315 "drzewiarz.tab.c"
     break;
 
   case 27: /* dzialanie: dzialanie MNIEJSZE_BADZ_ROWNE dzialanie  */
-#line 78 "drzewiarz.y"
+#line 79 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = utworzDzialanie(MNIEJSZE_BADZ_ROWNE, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1320 "drzewiarz.tab.c"
+#line 1321 "drzewiarz.tab.c"
     break;
 
   case 28: /* dzialanie: dzialanie I dzialanie  */
-#line 79 "drzewiarz.y"
+#line 80 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = utworzDzialanie(I, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1326 "drzewiarz.tab.c"
+#line 1327 "drzewiarz.tab.c"
     break;
 
   case 29: /* dzialanie: dzialanie LUB dzialanie  */
-#line 80 "drzewiarz.y"
+#line 81 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = utworzDzialanie(LUB, (yyvsp[-2].galazPodwojna), (yyvsp[0].galazPodwojna)); }
-#line 1332 "drzewiarz.tab.c"
+#line 1333 "drzewiarz.tab.c"
     break;
 
   case 30: /* dzialanie: LNAWIAS dzialanie PNAWIAS  */
-#line 81 "drzewiarz.y"
+#line 82 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = (yyvsp[-1].galazPodwojna); }
-#line 1338 "drzewiarz.tab.c"
+#line 1339 "drzewiarz.tab.c"
     break;
 
   case 31: /* dzialanie: ZMIENNA  */
-#line 82 "drzewiarz.y"
+#line 83 "drzewiarz.y"
                                                 { (yyval.galazPodwojna) = utworzZmiennaJakoGalaz((yyvsp[0].zmienna)); }
-#line 1344 "drzewiarz.tab.c"
+#line 1345 "drzewiarz.tab.c"
     break;
 
 
-#line 1348 "drzewiarz.tab.c"
+#line 1349 "drzewiarz.tab.c"
 
       default: break;
     }
@@ -1537,12 +1538,15 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 85 "drzewiarz.y"
+#line 86 "drzewiarz.y"
 
 
+int zmienniana = ZMIENNA;
 int kluczowe[] = { 0, JESLI, POKI};
+size_t liczbaSlowKluczowych = sizeof(kluczowe)/sizeof(kluczowe[0]);
 // char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+=", "-=", "*=", "/=", "%=", "+", "-", "*", "/", "%", "=", "!", ">", "<"};
 int dzialaniowe[] = {ROWNE, ROZNE, WIEKSZE_BADZ_ROWNE, MNIEJSZE_BADZ_ROWNE, LUB, I, NDODAJ, NODEJMIJ, NMNOZ, NDZIEL, NRESZTA, DODAJ, ODEJMIJ, MNOZ, DZIEL, RESZTA, NADAJ, NIE, WIEKSZE, MNIEJSZE};
+size_t liczbaDzialan = sizeof(dzialaniowe)/sizeof(dzialaniowe[0]);
 
 GalazPodwojna* utworzZmiennaJakoGalaz(size_t z)
 {
@@ -1762,6 +1766,7 @@ void zetnijRozgalezienie(Rozgalezienie* rozgalezienie)
 
 const char* nazwaRodzaju(int rodzaj)
 {
+    if(rodzaj == ZMIENNA) return "ZMIENNA";
     for(size_t i = 0; i < sizeof(dzialaniowe)/sizeof(dzialaniowe[0]); i++)
     {
         if(dzialaniowe[i] == rodzaj) return dzialania[i];
@@ -1770,44 +1775,7 @@ const char* nazwaRodzaju(int rodzaj)
     {
         if(kluczowe[i] == rodzaj) return slowaKluczowe[i];
     }
-    if(rodzaj == ZMIENNA) return "ZMIENNA";
     return "???";
-    /*switch(rodzaj) {
-        // Operatory arytmetyczne
-        case DODAJ: return "DODAJ";
-        case ODEJMIJ: return "ODEJMIJ";
-        case MNOZ: return "MNOZ";
-        case DZIEL: return "DZIEL";
-        case RESZTA: return "RESZTA";
-        case NIE: return "NIE";
-        
-        // Operator przypisania
-        case NADAJ: return "NADAJ";
-        case NDODAJ: return "NDODAJ";
-        case NODEJMIJ: return "NODEJMIJ";
-        case NMNOZ: return "NMNOZ";
-        case NDZIEL: return "NDZIEL";
-        case NRESZTA: return "NRESZTA";
-        
-        // Operatory porównania
-        case ROWNE: return "ROWNE";
-        case ROZNE: return "ROZNE";
-        case WIEKSZE: return "WIEKSZE";
-        case MNIEJSZE: return "MNIEJSZE";
-        case WIEKSZE_BADZ_ROWNE: return "WIEKSZE_BADZ_ROWNE";
-        case MNIEJSZE_BADZ_ROWNE: return "MNIEJSZE_BADZ_ROWNE";
-        case I: return "I";
-        case LUB: return "LUB";
-        
-        // Instrukcje kontrolne
-        case JESLI: return "JESLI";
-        case POKI: return "POKI";
-        
-        // Zmienna
-        case ZMIENNA: return "ZMIENNA";
-        
-        default: return "???";
-    }*/
 }
 
 void wypiszGalaz(GalazPodwojna* galaz, int wciecie)

@@ -1,3 +1,4 @@
-cd "C:\Users\_USER_\Desktop\CZ2"
-bison -d drzewiarz.y
-gcc czytnik.c drzewiarz.tab.c -o cezak.exe -lgmp
+cd "C:\Users\_USER_\Desktop\CZ2"                            // przejście do folderu
+bison -d drzewiarz.y                                        // kompilacja drzewiarza (MSYS)
+gcc czytnik.c drzewiarz.tab.c -o cezak.exe -lgmp            // kompilacja całości (MINGW64)
+gcc -shared -o podstawy.dll podstawy.c -lgmp                // kompilacja podstawy.c na dll (MINGW64)
