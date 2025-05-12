@@ -6,6 +6,7 @@
 #include <gmp.h>
 #include <stdint.h>
 #include <inttypes.h>
+#include <unistd.h>
 
 #include "powszechne.h"
 #include "dzielone.h"
@@ -566,7 +567,8 @@ size_t wczytujJakoObszarGlowny(char** wskaznik)
     wypiszDrzewo(drzewo, 0);
     getchar();
 
-    pekCzytelnegoPocztu = fopen("C:\\Users\\_USER_\\Desktop\\CZ2\\poczet.txt", "w");
+    //pekCzytelnegoPocztu = fopen("C:\\Users\\_USER_\\Desktop\\CZ2\\poczet.txt", "w");
+    pekCzytelnegoPocztu = fopen("poczet.txt", "w+");
     if(pekCzytelnegoPocztu == NULL)
     {
         perror("fopen (poczet.txt)");
@@ -987,6 +989,15 @@ int main(int argc, char *argv[])
     else if(dlugosc > 3 && strcmp(argv[1] + dlugosc - 3, ".cz") == 0) obszarPrzygotowawczy = przygotowanieDlaCz();
     else niezbywalnyBlad("Wymagany pek .czp lub .cz");
     printf("Zapisano obszar przygotowawczy na miejscu %zu\n", obszarPrzygotowawczy);
+
+    char sciezka[1024];
+    strncpy(sciezka, argv[1], sizeof(sciezka));
+    sciezka[sizeof(sciezka) - 1] = '\0';
+    char dysk[_MAX_DRIVE], kat[_MAX_DIR];
+    _splitpath(sciezka, dysk, kat, NULL, NULL);
+    char folder[1024];
+    snprintf(folder, sizeof(folder), "%s%s", dysk, kat);
+    SetCurrentDirectoryA(folder);
 
     polecenia = (Polecenie*)malloc(sizeof(Polecenie) * pojemnoscPolecen);
     if(!polecenia) niezbywalnyBlad("Brak pamieci");
