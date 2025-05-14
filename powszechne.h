@@ -51,8 +51,9 @@ typedef struct {
 
 typedef void (*SciagnijZmienneKon)(Zmienna***, size_t*, size_t*);
 typedef void (*SciagnijNazwyZmiennychKon)(char***, size_t*, size_t*);
+typedef void (*SciagnijPoczetKon)(char***, size_t***, size_t***, size_t***);
 
-typedef void (*DostosujKon)(SciagnijZmienneKon, SciagnijNazwyZmiennychKon);
+typedef void (*DostosujKon)(SciagnijZmienneKon, SciagnijNazwyZmiennychKon, SciagnijPoczetKon);
 
 
 #ifdef __cplusplus

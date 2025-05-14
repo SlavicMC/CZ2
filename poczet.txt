@@ -2,8 +2,8 @@ nadaj_dz 14 1 2
 nadaj_dz 14 3 4
 dodaj_dz 16 1 3
 rowne_dz 15 5 16
-wieksze_badz_rowne_dz 15 3 1
-lub_dz 14 15 15
+wieksze_badz_rowne_dz 17 3 1
+lub_dz 14 15 17
 jesli_klc 14
 ndodaj_dz 14 1 6
 nodejmij_dz 14 3 6
@@ -11,8 +11,8 @@ nadaj_dz 14 7 8
 nadaj_dz 14 9 10
 nadaj_dz 14 11 12
 wieksze_dz 15 3 13
-nie_dz 15 11
-i_dz 14 15 15
+nie_dz 17 11
+i_dz 14 15 17
 poki_klc 14
 nmnoz_dz 14 3 6
 skok_wjk 292
