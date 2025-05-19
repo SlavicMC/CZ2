@@ -24,9 +24,15 @@ typedef struct
 
 typedef struct
 {
-    size_t odnosnik;
-    size_t nazwa;
+    Zmienna** wWZmiennej;
+    size_t odnosnikNazwy;
 } Ozin; // odnosnik zmiennej i nazwy
+
+typedef struct
+{
+    Zmienna** wWZmiennej;
+    size_t liczba;
+} ZmiennaILiczba;
 
 typedef struct
 {
@@ -49,12 +55,33 @@ typedef struct {
 } Rozgalezienie;
 
 
-typedef void (*SciagnijZmienneKon)(Zmienna***, size_t*, size_t*);
+//typedef void (*SciagnijZmienneKon)(Zmienna***, size_t*, size_t*);
+typedef void (*SciagnijObszarPowszechnyKon)(Zmienna****);
 typedef void (*SciagnijNazwyZmiennychKon)(char***, size_t*, size_t*);
-typedef void (*SciagnijPoczetKon)(char***, size_t***, size_t***, size_t***);
+typedef void (*SciagnijPoczetKon)(char***, size_t**);
 
-typedef void (*DostosujKon)(SciagnijZmienneKon, SciagnijNazwyZmiennychKon, SciagnijPoczetKon);
+typedef void (*DostosujKon)(SciagnijObszarPowszechnyKon, SciagnijNazwyZmiennychKon, SciagnijPoczetKon);
 
+
+static inline char* zawartosc(Zmienna* zmienna)
+{
+    return (char*)zmienna + sizeof(Zmienna);
+}
+
+static inline Ozin* cechy(Zmienna* zmienna)
+{
+    return (Ozin*)((char*)zmienna + sizeof(Zmienna) + zmienna->pojemnosc);
+}
+
+static inline Zmienna** pozyskajZmiennaZObszaru(Zmienna* obszar, size_t odnosnik)
+{
+    return ((Ozin*)((char*)obszar + sizeof(Zmienna) + odnosnik * sizeof(Ozin)))->wWZmiennej;
+}
+
+static inline size_t pozyskajOdnosnikNazwyZObszaru(Zmienna* obszar, size_t odnosnik)
+{
+    return ((Ozin*)((char*)obszar + sizeof(Zmienna) + odnosnik * sizeof(Ozin)))->odnosnikNazwy;
+}
 
 #ifdef __cplusplus
 }

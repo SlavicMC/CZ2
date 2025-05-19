@@ -15,4 +15,5 @@ nie_dz 17 11
 i_dz 14 15 17
 poki_klc 14
 nmnoz_dz 14 3 6
-skok_wjk 292
+skok_wjk 300
+zakoncz_dom

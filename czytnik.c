@@ -12,9 +12,24 @@
 #include "dzielone.h"
 
 
+/*
 Zmienna** zmienne = NULL;               // zmienne
 size_t liczbaZmiennych = 0;             // liczba używanych zmiennych
 size_t pojemnoscZmiennych = 0;          // przypisane zmiennym miejsce
+*/
+
+Zmienna** wWObszaruPowszechnego = NULL;
+Zmienna** wWWykonywanegoObszaruGlownego = NULL;
+Zmienna** wWWykonywanegoObszaru = NULL;
+Ozin* oziny = NULL;
+
+Zmienna** wWWykonywanegoPocztu = NULL;
+char* poczet = NULL;
+size_t odnosnikPolecenia = 0;
+
+ZmiennaILiczba* stosWyjsc = NULL;
+size_t liczbaStosuWyjsc = 0;
+size_t pojemnoscStosuWyjsc = 0;
 
 char** nazwyZmiennych = NULL;
 size_t liczbaNazwZmiennych = 0;
@@ -26,19 +41,21 @@ char* poczatek = NULL;
 char* koniec = NULL;
 
 FILE* pekCzytelnegoPocztu;
-int dlugoscTrzymakaNazwTymczasowych;
+unsigned int dlugoscTrzymakaNazwTymczasowych;
 char* trzymakNazwTymaczasowych = NULL;
 
 //size_t liczbaOzinow;
 //size_t pojemnoscOzinow;
+/*
 size_t* wskaznikLiczbyOzinow = NULL;
 size_t* wskaznikPojemnosciOzinow = NULL;
 Ozin* oziny;
+*/
 //size_t dlugoscPocztu = 0;
-size_t* wskaznikOdnosnikaPolecenia;
-size_t* wskaznikDlugosciPocztu = NULL;
+//size_t* wskaznikOdnosnikaPolecenia;
+/*size_t* wskaznikDlugosciPocztu = NULL;
 size_t* wskaznikPojemnosciPocztu = NULL;
-char* poczet;
+char* poczet;*/
 
 char* slowaKluczowe[] = {"###", "jesli", "poki"};
 char* nazwyPolecenSlowKluczowych[] = {"###", "jesli_klc", "poki_klc"};
@@ -68,19 +85,14 @@ uintptr_t nastepnaPotegaDwojki(uintptr_t x)
     return x + 1;
 }
 
-char* zawartosc(Zmienna* zmienna)
-{
-    return (char*)zmienna + sizeof(Zmienna);
-}
-
 void niezbywalnyBlad(const char* wiadomosc)
 {
     fprintf(stderr, "[NIEZBYWALNY BLAD] %s\n", wiadomosc);
-    for(size_t i = 1; i < liczbaZmiennych; i++)
+    /*for(size_t i = 1; i < liczbaZmiennych; i++)
     {
         if(zmienne[i]) free(zmienne[i]);
     }
-    if(zmienne) free(zmienne);
+    if(zmienne) free(zmienne);*/
     for(size_t i = 1; i < liczbaNazwZmiennych; i++)
     {
         if(nazwyZmiennych[i]) free(nazwyZmiennych[i]);
@@ -100,19 +112,6 @@ void niezbywalnyBlad(const char* wiadomosc)
     exit(EXIT_FAILURE);
 }
 
-size_t odnosnikWTablicyChar(const char* szukany, const char* tablica[])
-{
-    for (size_t i = 0; tablica[i] != NULL; i++) {
-        if (strcmp(szukany, tablica[i]) == 0) {
-            return 1; // Znaleziono
-        }
-    }
-    return 0; // Nie znaleziono
-}
-
-// $ - obszary główne
-// ! - zmienne wczytywane
-// = - zmienne tymczasowe (do obliczeń)
 size_t dodajNazweZmiennej(char* nazwa, size_t dlugosc)
 {
     if(!nazwa) return 0;
@@ -131,10 +130,15 @@ size_t dodajNazweZmiennej(char* nazwa, size_t dlugosc)
     return liczbaNazwZmiennych++;
 }
 
+// $ - obszary główne
+// ! - zmienne wczytywane
+// = - zmienne tymczasowe (do obliczeń)
+// @ - poczet obszaru
 size_t znajdzLubDodajNazweZmiennej(char* nazwa, size_t dlugosc)
 {
     if(nazwa == NULL) return 0;
     if(dlugosc == 0) dlugosc = strlen(nazwa);
+    if(dlugosc == 0) return 0;
     for(size_t i = 1; i < liczbaNazwZmiennych; i++)
     {
         if(memcmp(nazwa, nazwyZmiennych[i], dlugosc) == 0 && nazwyZmiennych[i][dlugosc] == '\0') return i;
@@ -153,7 +157,7 @@ size_t znajdzLubDodajNazweZmiennej(char* nazwa, size_t dlugosc)
     return liczbaNazwZmiennych++;
 }
 
-size_t utworzZmienna(size_t rozmiar, size_t pojemnosc, size_t rod, void* zawartosc)
+Zmienna** utworzZmienna(size_t rozmiar, size_t pojemnosc, size_t rod, void* zawartosc)
 {
     if(rozmiar > pojemnosc) pojemnosc = nastepnaPotegaDwojki(rozmiar);
     Zmienna* zmienna = (Zmienna*)malloc(sizeof(Zmienna) + pojemnosc);
@@ -163,45 +167,100 @@ size_t utworzZmienna(size_t rozmiar, size_t pojemnosc, size_t rod, void* zawarto
     zmienna->rod = rod;
     zmienna->cechy = 0;
     memcpy((char*)zmienna + sizeof(Zmienna), zawartosc, rozmiar);
-    if(liczbaZmiennych >= pojemnoscZmiennych)
+    /*if(liczbaZmiennych >= pojemnoscZmiennych)
     {
         pojemnoscZmiennych *= 2;
         zmienne = (Zmienna**)realloc(zmienne, pojemnoscZmiennych * sizeof(Zmienna*));
         if(!zmienne) niezbywalnyBlad("Brak pamieci");
     }
     zmienne[liczbaZmiennych] = zmienna;
-    return liczbaZmiennych++;
+    return liczbaZmiennych++;*/
+    Zmienna** wskaznik = (Zmienna**)malloc(sizeof(Zmienna*));
+    if(!wskaznik) niezbywalnyBlad("Brak pamieci");
+    *wskaznik = zmienna;
+    return wskaznik;
 }
 
-size_t utworzZmiennaZCechami(size_t rozmiar, size_t pojemnosc, size_t rod, size_t cechy, char* zawartosc, size_t* zawartoscCech)
+Zmienna** utworzZmiennaZCechami(size_t rozmiar, size_t pojemnosc, size_t rod, size_t cechy, char* zawartosc, Ozin* zawartoscCech)
 {
     if(rozmiar > pojemnosc) pojemnosc = nastepnaPotegaDwojki(rozmiar);
-    Zmienna* zmienna = (Zmienna*)malloc(sizeof(Zmienna) + pojemnosc + cechy * sizeof(size_t));
+    Zmienna* zmienna = (Zmienna*)malloc(sizeof(Zmienna) + pojemnosc + cechy * sizeof(Ozin));
     if(zmienna == NULL) niezbywalnyBlad("Brak pamieci");
     zmienna->rozmiar = rozmiar;
     zmienna->pojemnosc = pojemnosc;
     zmienna->rod = rod;
     zmienna->cechy = cechy;
-    char *w = (char*)zmienna + sizeof(Zmienna);
+    char* w = (char*)zmienna + sizeof(Zmienna);
     memcpy(w, zawartosc, rozmiar);
-    memcpy(w + pojemnosc, zawartoscCech, cechy * sizeof(size_t));
-    if(liczbaZmiennych >= pojemnoscZmiennych)
+    memcpy(w + pojemnosc, zawartoscCech, cechy * sizeof(Ozin));
+    /*if(liczbaZmiennych >= pojemnoscZmiennych)
     {
         pojemnoscZmiennych *= 2;
         zmienne = (Zmienna**)realloc(zmienne, pojemnoscZmiennych * sizeof(Zmienna*));
         if(zmienne == NULL) niezbywalnyBlad("Brak pamieci");
     }
     zmienne[liczbaZmiennych] = zmienna;
-    return liczbaZmiennych++;
+    return liczbaZmiennych++;*/
+    Zmienna** wskaznik = (Zmienna**)malloc(sizeof(Zmienna*));
+    if(!wskaznik) niezbywalnyBlad("Brak pamieci");
+    *wskaznik = zmienna;
+    return wskaznik;
 }
 
-size_t znajdzLubUtworzZmiennaWOzinach(char* nazwa, size_t rozmiar, size_t pojemnosc, size_t rod, void* zaw)
+void dodajZawartoscDoZmiennej(Zmienna** wWZmiennej, size_t rozmiar, void* zaw)
 {
-    size_t liczbaOzinow = *wskaznikLiczbyOzinow;
-    for(size_t i = 0; i < liczbaOzinow; i++)
+    if(!wWZmiennej) return;
+    Zmienna* wZmiennej = *wWZmiennej;
+    size_t wymagane = wZmiennej->rozmiar + rozmiar;
+    if(wymagane > wZmiennej->pojemnosc)
     {
-        if(oziny[i].odnosnik == 0) continue;
-        Zmienna* z = zmienne[oziny[i].odnosnik];
+        size_t pojemnosc = nastepnaPotegaDwojki(wymagane);
+        wZmiennej = (Zmienna*)realloc(wZmiennej, sizeof(Zmienna) + pojemnosc + wZmiennej->cechy * sizeof(Ozin));
+        if(!wZmiennej) niezbywalnyBlad("Brak pamieci");
+        if(wZmiennej->cechy)
+        {
+            Ozin* starePolozenieCech = cechy(wZmiennej);
+            wZmiennej->pojemnosc = pojemnosc;
+            memmove(cechy(wZmiennej), starePolozenieCech, wZmiennej->cechy * sizeof(Ozin));
+        }
+        else wZmiennej->pojemnosc = pojemnosc;
+        *wWZmiennej = wZmiennej;
+    }
+    memcpy(zawartosc(wZmiennej) + wZmiennej->rozmiar, zaw, rozmiar);
+    wZmiennej->rozmiar = wymagane;
+}
+
+size_t utworzZmiennaWObszarze(Zmienna** wWObszaru, char* nazwa, size_t rozmiar, size_t pojemnosc, size_t rod, void* zaw)
+{
+    if(!wWObszaru) return 0;
+    size_t liczbaPrzeszukiwanychOzinow = (*wWObszaru)->rozmiar / sizeof(Ozin);
+
+    if(rozmiar > pojemnosc) pojemnosc = nastepnaPotegaDwojki(rozmiar);
+    Zmienna* zmienna = (Zmienna*)malloc(sizeof(Zmienna) + pojemnosc);
+    if(!zmienna) niezbywalnyBlad("Brak pamieci");
+    zmienna->rozmiar = rozmiar;
+    zmienna->pojemnosc = pojemnosc;
+    zmienna->rod = rod;
+    zmienna->cechy = 0;
+    memcpy((char*)zmienna + sizeof(Zmienna), zaw, rozmiar);
+    Zmienna** wskaznik = (Zmienna**)malloc(sizeof(Zmienna*));
+    if(!wskaznik) niezbywalnyBlad("Brak pamieci");
+    *wskaznik = zmienna;
+    Ozin o = {wskaznik, znajdzLubDodajNazweZmiennej(nazwa, 0)};
+    dodajZawartoscDoZmiennej(wWObszaru, sizeof(Ozin), &o);
+    return liczbaPrzeszukiwanychOzinow;
+}
+
+size_t znajdzLubUtworzZmiennaWObszarze(Zmienna** wWObszaru, char* nazwa, size_t rozmiar, size_t pojemnosc, size_t rod, void* zaw)
+{
+    if(!wWObszaru) return 0;
+    size_t liczbaPrzeszukiwanychOzinow = (*wWObszaru)->rozmiar / sizeof(Ozin);
+    Ozin* przeszukiwaneOziny = (Ozin*)zawartosc(*wWObszaru);
+
+    for(size_t i = 1; i < liczbaPrzeszukiwanychOzinow; i++)
+    {
+        if(przeszukiwaneOziny[i].wWZmiennej == NULL) continue;
+        Zmienna* z = *(przeszukiwaneOziny[i].wWZmiennej);
         if(z->rod == rod && z->rozmiar == rozmiar && memcmp(zaw, zawartosc(z), rozmiar) == 0) return i;
     }
 
@@ -213,7 +272,7 @@ size_t znajdzLubUtworzZmiennaWOzinach(char* nazwa, size_t rozmiar, size_t pojemn
     zmienna->rod = rod;
     zmienna->cechy = 0;
     memcpy((char*)zmienna + sizeof(Zmienna), zaw, rozmiar);
-    if(liczbaZmiennych >= pojemnoscZmiennych)
+    /*if(liczbaZmiennych >= pojemnoscZmiennych)
     {
         pojemnoscZmiennych *= 2;
         zmienne = (Zmienna**)realloc(zmienne, pojemnoscZmiennych * sizeof(Zmienna*));
@@ -234,15 +293,38 @@ size_t znajdzLubUtworzZmiennaWOzinach(char* nazwa, size_t rozmiar, size_t pojemn
         return (*wskaznikLiczbyOzinow)++;
     }
     printf("ZWROCONO ODNOSNIK ZMIENNEJ, NIE OZINA\n");
-    return liczbaZmiennych++;
+    return liczbaZmiennych++;*/
+    Zmienna** wskaznik = (Zmienna**)malloc(sizeof(Zmienna*));
+    if(!wskaznik) niezbywalnyBlad("Brak pamieci");
+    *wskaznik = zmienna;
+    Ozin o = {wskaznik, znajdzLubDodajNazweZmiennej(nazwa, 0)};
+    dodajZawartoscDoZmiennej(wWObszaru, sizeof(Ozin), &o);
+    return liczbaPrzeszukiwanychOzinow;
+}
+
+Zmienna** znajdzZmiennaWObszarze(Zmienna** wWObszaru, size_t odnosnikNazwy)
+{
+    if(!wWObszaru) return 0;
+    size_t liczbaPrzeszukiwanychOzinow = (*wWObszaru)->rozmiar / sizeof(Ozin);
+    Ozin* przeszukiwaneOziny = (Ozin*)zawartosc(*wWObszaru);
+
+    for(size_t i = 1; i < liczbaPrzeszukiwanychOzinow; i++)
+    {
+        if(przeszukiwaneOziny[i].odnosnikNazwy == odnosnikNazwy) return przeszukiwaneOziny[i].wWZmiennej;
+    }
+    return NULL;
 }
 
 
-void sciagnijZmienne(Zmienna*** wskaznikZmiennych, size_t* wskaznikLiczbyZmiennych, size_t* wskaznikPojemnosciZmiennych)
+/*void sciagnijZmienne(Zmienna*** wskaznikZmiennych, size_t* wskaznikLiczbyZmiennych, size_t* wskaznikPojemnosciZmiennych)
 {
     if(wskaznikZmiennych) wskaznikZmiennych = &zmienne;
     if(wskaznikLiczbyZmiennych) wskaznikLiczbyZmiennych = &liczbaZmiennych;
     if(wskaznikPojemnosciZmiennych) wskaznikPojemnosciZmiennych = &pojemnoscZmiennych;
+}*/
+void sciagnijObszarPowszechny(Zmienna**** wWWWObszaruPowszechnego)
+{
+    if(wWWWObszaruPowszechnego) *wWWWObszaruPowszechnego = &wWObszaruPowszechnego;
 }
 
 void sciagnijNazwyZmiennych(char*** wskaznikNazwZmiennych, size_t* wskaznikLiczbyNazwZmiennych, size_t* wskaznikPojemnosciNazwZmiennych)
@@ -252,12 +334,18 @@ void sciagnijNazwyZmiennych(char*** wskaznikNazwZmiennych, size_t* wskaznikLiczb
     if(wskaznikPojemnosciNazwZmiennych) wskaznikPojemnosciNazwZmiennych = &pojemnoscNazwZmiennych;
 }
 
-void sciagnijPoczet(char*** wWPocztu, size_t*** wWWOdnosnikaPolecenia, size_t*** wWWDlugosciPocztu, size_t*** wWWPojemnosciPocztu)
+/*void sciagnijPoczet(char*** wWPocztu, size_t*** wWWOdnosnikaPolecenia, size_t*** wWWDlugosciPocztu, size_t*** wWWPojemnosciPocztu)
 {
     if(wWPocztu) *wWPocztu = &poczet;
     if(wWWOdnosnikaPolecenia) *wWWOdnosnikaPolecenia = &wskaznikOdnosnikaPolecenia;
     if(wWWDlugosciPocztu) *wWWDlugosciPocztu = &wskaznikDlugosciPocztu;
     if(wWWPojemnosciPocztu) *wWWPojemnosciPocztu = &wskaznikPojemnosciPocztu;
+}*/
+
+void sciagnijPoczet(char*** wWPocztu, size_t** wWOdnosnikaPolecenia)
+{
+    if(wWPocztu) *wWPocztu = &poczet;
+    if(wWOdnosnikaPolecenia) *wWOdnosnikaPolecenia = &odnosnikPolecenia;
 }
 
 size_t walkujGalazPodwojna(GalazPodwojna* galaz, size_t liczbaZmiennychTymczasowych);
@@ -277,11 +365,11 @@ size_t walkujGalazPodwojna(GalazPodwojna* galaz, size_t liczbaZmiennychTymczasow
             printf("Rozpoczeto wpisywanie slowa kluczowego: %s (liczba zmiennych tymczasowych: %zu)", nazwyPolecenSlowKluczowych[i], liczbaZmiennychTymczasowych);
             getchar();
             if(!galaz->lewa || !galaz->prawa) niezbywalnyBlad("Blad wczytywania slowa kluczowego (brak galezi)");
-            size_t poczatekPocztuSlowaKluczowego = *wskaznikDlugosciPocztu; // zapisujemy gdzie zaczynamy bo wałkowanie lewej gałęzi może i najpewniej go przesunie
+            size_t poczatekPocztuSlowaKluczowego = (*wWWykonywanegoPocztu)->rozmiar; // zapisujemy gdzie zaczynamy bo wałkowanie lewej gałęzi może i najpewniej go przesunie
 
             size_t z1 = walkujGalazPodwojna((GalazPodwojna*)(galaz->lewa), liczbaZmiennychTymczasowych);
 
-            size_t dlugoscPocztu = *wskaznikDlugosciPocztu;
+            /*size_t dlugoscPocztu = *wskaznikDlugosciPocztu;
             size_t pojemnoscPocztu = *wskaznikPojemnosciPocztu;
             size_t wymaganaDlugosc = dlugoscPocztu + 1 + sizeof(size_t)*2;
             if(pojemnoscPocztu < wymaganaDlugosc)
@@ -289,64 +377,72 @@ size_t walkujGalazPodwojna(GalazPodwojna* galaz, size_t liczbaZmiennychTymczasow
                 pojemnoscPocztu = nastepnaPotegaDwojki(wymaganaDlugosc);
                 poczet = (char*)realloc(poczet, pojemnoscPocztu);
                 if(poczet == NULL) niezbywalnyBlad("Brak pamieci");
-            }
+            }*/
 
-            fprintf(pekCzytelnegoPocztu, "%s %zu\n", nazwyPolecenSlowKluczowych[i], z1);
             unsigned char odnosnikPolecenia = 0; // 0 to nieprawidłowe polecenie (w tablicy ma wartość NULL)
             for(unsigned char j = 1; j < liczbaPolecen; j++)
             {
-                if(strcmp(nazwyPolecen[j], nazwyPolecenSlowKluczowych[i]) == 0) odnosnikPolecenia = j;
+                if(strcmp(nazwyPolecen[j], nazwyPolecenSlowKluczowych[i]) == 0)
+                {
+                    odnosnikPolecenia = j;
+                    break;
+                }
             }
             if(!odnosnikPolecenia) niezbywalnyBlad("Nie znaleziono polecenia obslugujacego slowo kluczowe");
-            memcpy(poczet + dlugoscPocztu, &odnosnikPolecenia, 1);
-            dlugoscPocztu++;
-            memcpy(poczet + dlugoscPocztu, &z1, sizeof(size_t));
-            dlugoscPocztu += sizeof(size_t);
-            size_t miejsceSkoku = dlugoscPocztu; // zapisujemy gdzie wpiszemy wartość skoku kiedy ją znajdziemy
-            dlugoscPocztu += sizeof(size_t); // a na razie pomijamy tą wartość
+            //memcpy(poczet + dlugoscPocztu, &odnosnikPolecenia, 1);
+            //dlugoscPocztu++;
+            //memcpy(poczet + dlugoscPocztu, &z1, sizeof(size_t));
+            //dlugoscPocztu += sizeof(size_t);
+            dodajZawartoscDoZmiennej(wWWykonywanegoPocztu, sizeof(odnosnikPolecenia), &odnosnikPolecenia);
+            dodajZawartoscDoZmiennej(wWWykonywanegoPocztu, sizeof(z1), &z1);
+            fprintf(pekCzytelnegoPocztu, "%s %zu\n", nazwyPolecenSlowKluczowych[i], z1);
+            size_t miejsceSkoku = (*wWWykonywanegoPocztu)->rozmiar; // zapisujemy gdzie wpiszemy wartość skoku kiedy ją znajdziemy
+            (*wWWykonywanegoPocztu)->rozmiar += sizeof(size_t); // a na razie pomijamy tą wartość
 
-            // odswieżamy wskaźniki przed wałkowaniem rozgałęzienia
+            /*// odswieżamy wskaźniki przed wałkowaniem rozgałęzienia
             *wskaznikDlugosciPocztu = dlugoscPocztu;
-            *wskaznikPojemnosciPocztu = pojemnoscPocztu;
+            *wskaznikPojemnosciPocztu = pojemnoscPocztu;*/
             
             walkujRozgalezienie((Rozgalezienie*)(galaz->prawa), liczbaZmiennychTymczasowych);
 
-            // odświeżamy zmienne po wałkowaniu
+            /*// odświeżamy zmienne po wałkowaniu
             dlugoscPocztu = *wskaznikDlugosciPocztu;
-            pojemnoscPocztu = *wskaznikPojemnosciPocztu;
+            pojemnoscPocztu = *wskaznikPojemnosciPocztu;*/
 
             printf("Wpisano slowo kluczowe %s (%s)", nazwyPolecen[odnosnikPolecenia], nazwyPolecenSlowKluczowych[i]);
             if(i == 2) // jeśli to polecenie 'póki' musi mieć skok
             {
                 // poszerzamy pamięć jeśli to konieczne
-                size_t wymaganaDlugosc = dlugoscPocztu + 1 + sizeof(size_t);
+                /*size_t wymaganaDlugosc = dlugoscPocztu + 1 + sizeof(size_t);
                 if(pojemnoscPocztu < wymaganaDlugosc)
                 {
                     pojemnoscPocztu = nastepnaPotegaDwojki(wymaganaDlugosc);
                     poczet = (char*)realloc(poczet, pojemnoscPocztu);
                     if(poczet == NULL) niezbywalnyBlad("Brak pamieci");
-                }
+                }*/
 
                 // teraz szukamy polecenia skoku i dorzucamy je do pocztu
                 odnosnikPolecenia = 0;
                 for(unsigned char j = 1; j < liczbaPolecen; j++)
                 {
-                    if(strcmp(nazwyPolecen[j], "skok_wjk") == 0) odnosnikPolecenia = j;
+                    if(strcmp(nazwyPolecen[j], "skok_wjk") == 0)
+                    {
+                        odnosnikPolecenia = j;
+                        break;
+                    }
                 }
                 if(!odnosnikPolecenia) niezbywalnyBlad("Nie znaleziono polecenia obslugujacego wyjatkowe");
-                memcpy(poczet + dlugoscPocztu, &odnosnikPolecenia, 1);
-                dlugoscPocztu++;
+                /*memcpy(poczet + dlugoscPocztu, &odnosnikPolecenia, 1);
+                dlugoscPocztu++;*/
+                dodajZawartoscDoZmiennej(wWWykonywanegoPocztu, sizeof(odnosnikPolecenia), &odnosnikPolecenia);
+                dodajZawartoscDoZmiennej(wWWykonywanegoPocztu, sizeof(poczatekPocztuSlowaKluczowego), &poczatekPocztuSlowaKluczowego);
                 fprintf(pekCzytelnegoPocztu, "skok_wjk %zu\n", poczatekPocztuSlowaKluczowego);
-                memcpy(poczet + dlugoscPocztu, &poczatekPocztuSlowaKluczowego, sizeof(size_t));
-                dlugoscPocztu += sizeof(size_t);
-
-                // teraz wiedząc gdzie jest koniec wpisujemy wartość skoku
-                memcpy(poczet + miejsceSkoku, &dlugoscPocztu, sizeof(size_t));
-
-                *wskaznikDlugosciPocztu = dlugoscPocztu;
-                *wskaznikPojemnosciPocztu = pojemnoscPocztu;
-                printf("\nWpisano wyjatkowe %s (%s)", nazwyPolecen[odnosnikPolecenia], nazwyPolecenSlowKluczowych[i]);
+                /*memcpy(poczet + dlugoscPocztu, &poczatekPocztuSlowaKluczowego, sizeof(size_t));
+                dlugoscPocztu += sizeof(size_t);*/
             }
+            // teraz wiedząc gdzie jest koniec wpisujemy wartość skoku
+            memcpy(zawartosc(*wWWykonywanegoPocztu) + miejsceSkoku, &((*wWWykonywanegoPocztu)->rozmiar), sizeof(size_t));
+            printf("\nWpisano wyjatkowe %s (%s)", nazwyPolecen[odnosnikPolecenia], nazwyPolecenSlowKluczowych[i]);
             getchar();
             return 0;
         }
@@ -359,51 +455,61 @@ size_t walkujGalazPodwojna(GalazPodwojna* galaz, size_t liczbaZmiennychTymczasow
             getchar();
             snprintf(trzymakNazwTymaczasowych, dlugoscTrzymakaNazwTymczasowych, "=t%zu", liczbaZmiennychTymczasowych);
             size_t nazwa = znajdzLubDodajNazweZmiennej(trzymakNazwTymaczasowych, 0);
-            size_t wynik = znajdzLubUtworzZmiennaWOzinach(nazwyZmiennych[nazwa], sizeof(size_t), 0, 0, &nazwa);
+            size_t wynik = znajdzLubUtworzZmiennaWObszarze(wWWykonywanegoObszaru, nazwyZmiennych[nazwa], sizeof(size_t), sizeof(size_t), 0, &nazwa);
             size_t z1 = walkujGalazPodwojna((GalazPodwojna*)(galaz->lewa), liczbaZmiennychTymczasowych + 1);
             size_t z2 = walkujGalazPodwojna((GalazPodwojna*)(galaz->prawa), liczbaZmiennychTymczasowych + 2);
 
-            size_t dlugoscPocztu = *wskaznikDlugosciPocztu;
+            /*size_t dlugoscPocztu = *wskaznikDlugosciPocztu;
             size_t pojemnoscPocztu = *wskaznikPojemnosciPocztu;
-            size_t wymaganaDlugosc = dlugoscPocztu + 1 + sizeof(size_t)*3; // wydłużamy poczet o odnośnik polecenia i 3 argumenty
+            size_t wymaganaDlugosc = dlugoscPocztu + 1 + sizeof(size_t) * 3; // wydłużamy poczet o odnośnik polecenia i 3 argumenty
             if(pojemnoscPocztu < wymaganaDlugosc)
             {
                 pojemnoscPocztu = nastepnaPotegaDwojki(wymaganaDlugosc);
                 poczet = (char*)realloc(poczet, pojemnoscPocztu);
                 if(poczet == NULL) niezbywalnyBlad("Brak pamieci");
-            }
+            }*/
 
-            fprintf(pekCzytelnegoPocztu, "%s %zu", nazwyPolecenDzialan[i], wynik); // wpisujemy nazwę polecenia i odnośnik zmiennej wynikowej
             unsigned char odnosnikPolecenia = 0; // 0 to nieprawidłowe polecenie (w tablicy ma wartość NULL)
             for(unsigned char j = 1; j < liczbaPolecen; j++)
             {
-                if(strcmp(nazwyPolecen[j], nazwyPolecenDzialan[i]) == 0) odnosnikPolecenia = j;
+                if(strcmp(nazwyPolecen[j], nazwyPolecenDzialan[i]) == 0)
+                {
+                    odnosnikPolecenia = j;
+                    break;
+                }
             }
             if(!odnosnikPolecenia) niezbywalnyBlad("Nie znaleziono polecenia obslugujacego dzialanie");
-            memcpy(poczet + dlugoscPocztu, &odnosnikPolecenia, 1);
+            dodajZawartoscDoZmiennej(wWWykonywanegoPocztu, sizeof(odnosnikPolecenia), &odnosnikPolecenia);
+            dodajZawartoscDoZmiennej(wWWykonywanegoPocztu, sizeof(wynik), &wynik);
+            fprintf(pekCzytelnegoPocztu, "%s %zu", nazwyPolecenDzialan[i], wynik); // wpisujemy nazwę polecenia i odnośnik zmiennej wynikowej
+            /*memcpy(poczet + dlugoscPocztu, &odnosnikPolecenia, 1);
             dlugoscPocztu++;
             memcpy(poczet + dlugoscPocztu, &wynik, sizeof(size_t));
-            dlugoscPocztu += sizeof(size_t);
+            dlugoscPocztu += sizeof(size_t);*/
             if(galaz->lewa) // jeśli mamy lewą stronę dopisujemy ją
             {
+                dodajZawartoscDoZmiennej(wWWykonywanegoPocztu, sizeof(z1), &z1);
                 fprintf(pekCzytelnegoPocztu, " %zu", z1);
-                memcpy(poczet + dlugoscPocztu, &z1, sizeof(size_t));
-                dlugoscPocztu += sizeof(size_t);
+                /*memcpy(poczet + dlugoscPocztu, &z1, sizeof(size_t));
+                dlugoscPocztu += sizeof(size_t);*/
             }
             if(galaz->prawa) // jeśli mamy prawą stronę dopisujemy ją
             {
+                dodajZawartoscDoZmiennej(wWWykonywanegoPocztu, sizeof(z2), &z2);
                 fprintf(pekCzytelnegoPocztu, " %zu", z2);
-                memcpy(poczet + dlugoscPocztu, &z2, sizeof(size_t));
-                dlugoscPocztu += sizeof(size_t);
+                /*memcpy(poczet + dlugoscPocztu, &z2, sizeof(size_t));
+                dlugoscPocztu += sizeof(size_t);*/
             }
             fprintf(pekCzytelnegoPocztu, "\n");
-            *wskaznikDlugosciPocztu = dlugoscPocztu;
-            *wskaznikPojemnosciPocztu = pojemnoscPocztu;
+            /**wskaznikDlugosciPocztu = dlugoscPocztu;
+            *wskaznikPojemnosciPocztu = pojemnoscPocztu;*/
             printf("Wpisano dzialanie %s (%s)", nazwyPolecen[odnosnikPolecenia], nazwyPolecenDzialan[i]);
             getchar();
             return wynik;
         }
     }
+    niezbywalnyBlad("Nie rozpoznano galezi");
+    return 0;
 }
 
 void walkujRozgalezienie(Rozgalezienie* rozgalezienie, size_t liczbaZmiennychTymczasowych)
@@ -416,7 +522,71 @@ void walkujRozgalezienie(Rozgalezienie* rozgalezienie, size_t liczbaZmiennychTym
 }
 
 
-void przelaczNaObszar(Zmienna* obszar, size_t* wskaznikPojemnosci)
+void przelaczNaPoczet(Zmienna** wWPocztu)
+{
+    if(!wWPocztu) return;
+    printf("Przelaczam poczet z %p na %p\n", wWWykonywanegoPocztu, wWPocztu);
+    if(wWWykonywanegoPocztu)
+    {
+        if(liczbaStosuWyjsc >= pojemnoscStosuWyjsc)
+        {
+            pojemnoscStosuWyjsc *= 2;
+            stosWyjsc = realloc(stosWyjsc, pojemnoscStosuWyjsc * sizeof(ZmiennaILiczba));
+            if(!stosWyjsc) niezbywalnyBlad("Brak pamieci");
+        }
+        stosWyjsc[liczbaStosuWyjsc].wWZmiennej = wWWykonywanegoPocztu;
+        stosWyjsc[liczbaStosuWyjsc].liczba = odnosnikPolecenia;
+        liczbaStosuWyjsc++;
+    }
+    wWWykonywanegoPocztu = wWPocztu;
+    odnosnikPolecenia = 0;
+    poczet = zawartosc(*wWPocztu) + sizeof(Zmienna**); // pomijamy wskaźnik obszaru na początku
+}
+
+void przelaczNaObszar(Zmienna** wWObszaru)
+{
+    if(!wWObszaru) return;
+    przelaczNaPoczet(((Ozin*)zawartosc(*wWObszaru))->wWZmiennej);
+    printf("Przelaczam obszar z %p na %p\n", wWWykonywanegoObszaru, wWObszaru);
+    if(wWWykonywanegoObszaru)
+    {
+        if(liczbaStosuWyjsc >= pojemnoscStosuWyjsc)
+        {
+            pojemnoscStosuWyjsc *= 2;
+            stosWyjsc = realloc(stosWyjsc, pojemnoscStosuWyjsc * sizeof(ZmiennaILiczba));
+            if(!stosWyjsc) niezbywalnyBlad("Brak pamieci");
+        }
+        stosWyjsc[liczbaStosuWyjsc].wWZmiennej = wWWykonywanegoObszaru;
+        stosWyjsc[liczbaStosuWyjsc].liczba = odnosnikPolecenia;
+        liczbaStosuWyjsc++;
+    }
+    wWWykonywanegoObszaru = wWObszaru;
+    oziny = (Ozin*)zawartosc(*wWObszaru);
+}
+
+void zejdz()
+{
+    if(liczbaStosuWyjsc)
+    {
+        liczbaStosuWyjsc--;
+        Zmienna** z = stosWyjsc[liczbaStosuWyjsc].wWZmiennej;
+        size_t l = stosWyjsc[liczbaStosuWyjsc].liczba;
+        if((*z)->rod == 1)
+        {
+            wWWykonywanegoObszaru = z;
+            oziny = (Ozin*)(zawartosc(*z));
+            zejdz(); // jeśli zeszliśmy na obszar musimy zejść jeszcze niżej by wczytać poczet
+        }
+        else if((*z)->rod == 2)
+        {
+            wWWykonywanegoPocztu = z;
+            odnosnikPolecenia = l;
+            poczet = zawartosc(*z) + sizeof(Zmienna**); // każdy poczet zaczyna się wskaźnikiem na obszar którego nie chcemy
+        }
+    }
+}
+
+/*void przelaczNaObszar(Zmienna* obszar, size_t* wskaznikPojemnosci)
 {
     char* dane = zawartosc(obszar);
 
@@ -434,47 +604,52 @@ void przelaczNaObszar(Zmienna* obszar, size_t* wskaznikPojemnosci)
         printf("%s: %zu\n", nazwyZmiennych[oziny[i].nazwa], oziny[i].odnosnik);
     }
     printf("Pierwszy znak pocztu: %d (%s)\n", poczet[0], nazwyPolecen[poczet[0]]);
-}
+}*/
 
 // zaklepuje pamięć i tworzy podstawowe zmienne rodowe
 void przygotowaniePodstawowe()
 {
-    const int liczbaZmiennychPodstawowych = 5;
+    const int liczbaZmiennychPodstawowych = 6;
 
-    pojemnoscZmiennych = nastepnaPotegaDwojki(liczbaZmiennychPodstawowych + 1);
+    size_t p = nastepnaPotegaDwojki(liczbaZmiennychPodstawowych + 1);
+    /*pojemnoscZmiennych = nastepnaPotegaDwojki(liczbaZmiennychPodstawowych + 1);
     zmienne = (Zmienna**)malloc(pojemnoscZmiennych*sizeof(Zmienna*));
     zmienne[0] = NULL;
-    liczbaZmiennych = 1;
+    liczbaZmiennych = 1;*/
 
-    pojemnoscNazwZmiennych = pojemnoscZmiennych;
-    nazwyZmiennych = (char**)malloc(pojemnoscNazwZmiennych*sizeof(char*));
+    Ozin pustyOzin = {NULL, 0};
+    wWObszaruPowszechnego = utworzZmienna(sizeof(pustyOzin), nastepnaPotegaDwojki(p * sizeof(Ozin)), 1, &pustyOzin);
+
+    pojemnoscNazwZmiennych = p;
+    nazwyZmiennych = (char**)malloc(pojemnoscNazwZmiennych * sizeof(char*));
     nazwyZmiennych[0] = NULL;
     liczbaNazwZmiennych = 1;
 
     // Tworzenie zmiennej obszaru
-    size_t pustyObszar[2] = {0};
-    utworzZmienna(sizeof(pustyObszar), sizeof(pustyObszar), 1, (char*)pustyObszar);
-    dodajNazweZmiennej("obs", 3);
+    utworzZmiennaWObszarze(wWObszaruPowszechnego, "obs", 0, 1, 1, NULL);
+    //dodajNazweZmiennej("obs", 3);
+
+    // Tworzenie zmiennej pocztu
+    Zmienna** pustyPoczet = NULL;
+    utworzZmiennaWObszarze(wWObszaruPowszechnego, "pct", sizeof(Zmienna**), sizeof(Zmienna**), 2, &pustyPoczet);
 
     // Tworzenie zmiennej liczby
-    char pustaLiczba = 0;
-    utworzZmienna(1, 1, 2, &pustaLiczba);
-    dodajNazweZmiennej("lic", 3);
+    unsigned char pustaLiczba = 0;
+    utworzZmiennaWObszarze(wWObszaruPowszechnego, "lic", 1, 1, 3, &pustaLiczba);
+    //dodajNazweZmiennej("lic", 3);
 
     // Tworzenie zmiennej pisma
-    char pustePismo[1];
-    utworzZmienna(0, 1, 3, pustePismo);
-    dodajNazweZmiennej("pis", 3);
+    utworzZmiennaWObszarze(wWObszaruPowszechnego, "pis", 0, 1, 4, NULL);
+    //dodajNazweZmiennej("pis", 3);
 
     // Tworzenie zmiennej tak-lub-nie (boolean)
-    char pustyTln = 0;
-    utworzZmienna(1, 1, 4, &pustyTln);
-    dodajNazweZmiennej("tln", 3);
+    utworzZmiennaWObszarze(wWObszaruPowszechnego, "tln", 1, 1, 5, &pustaLiczba);
+    //dodajNazweZmiennej("tln", 3);
 }
 
 void przygotowanieDlaCzp()
 {
-    const int r = sizeof(hasloCzp)/sizeof(char);
+    /*const int r = sizeof(hasloCzp)/sizeof(char);
     unsigned char bajty[r];
     fread(bajty, 1, r, zrodlo);
     if(memcmp(bajty, hasloCzp, r) != 0)
@@ -495,27 +670,31 @@ void przygotowanieDlaCzp()
     w = (uintptr_t*)((char*)w + sizeof(uintptr_t));
     *w = 1;
     *((char*)w + sizeof(uintptr_t)) = 2;
-    zmienne[liczbaZmiennych] = obszarDomyslny;
+    zmienne[liczbaZmiennych] = obszarDomyslny;*/
 }
 
 size_t przygotowanieDlaCz()
 {
     przygotowaniePodstawowe();
-    size_t w1 = 0;
+    /*size_t w1 = 0;
     size_t w2 = 2;
     char p1 = 2;
     char p2 = 3;
-    char zawartosc[sizeof(size_t) * 2 + 2];
+    char zaw[sizeof(size_t) * 2 + 2];
 
-    memcpy(zawartosc, &w1, sizeof(size_t));
-    memcpy(zawartosc + sizeof(size_t), &w2, sizeof(size_t));
-    memcpy(zawartosc + sizeof(size_t) * 2, &p1, sizeof(char));
-    memcpy(zawartosc + sizeof(size_t) * 2 + sizeof(char), &p2, sizeof(char));
-    size_t odnosnikZmiennej = utworzZmienna(sizeof(size_t) * 2 + 2, 0, 1, zawartosc);
+    memcpy(zaw, &w1, sizeof(size_t));
+    memcpy(zaw + sizeof(size_t), &w2, sizeof(size_t));
+    memcpy(zaw + sizeof(size_t) * 2, &p1, sizeof(char));
+    memcpy(zaw + sizeof(size_t) * 2 + sizeof(char), &p2, sizeof(char));
+    size_t odnosnikZmiennej = utworzZmienna(sizeof(size_t) * 2 + 2, 0, 1, zaw);
     size_t odnosnikNazwy = dodajNazweZmiennej("$domyslny", 9);
     if(odnosnikZmiennej == odnosnikNazwy) return odnosnikZmiennej;
     else niezbywalnyBlad("Pomieszanie odnosnikow");
-    return 0;
+    return 0;*/
+    char zaw[sizeof(Zmienna**) + 2] = {0};
+    zaw[sizeof(Zmienna**)] = 2;
+    zaw[sizeof(Zmienna**) + 1] = 3;
+    return utworzZmiennaWObszarze(wWObszaruPowszechnego, "$domyslny", sizeof(zaw), 0, 2, &zaw);
 }
 
 Czastka wczytujNastepne(char** wskaznik);
@@ -527,19 +706,27 @@ size_t wczytujJakoObszarGlowny(char** wskaznik)
     char* polozenie = *wskaznik;
     printf("Zaladowany tekst:\n%s\n", polozenie);
     
-    size_t liczbaOzinowObszaru = 1;
+    /*size_t liczbaOzinowObszaru = 1;
     size_t pojemnoscOzinowObszaru = 1;
     Ozin* ozinyObszaru = (Ozin*)malloc(sizeof(Ozin) * pojemnoscOzinowObszaru);
-    ozinyObszaru[0].odnosnik = 0;
-    ozinyObszaru[0].nazwa = 0;
+    ozinyObszaru[0].odnosnikNazwy = 0;
+    ozinyObszaru[0].wWZmiennej = NULL;*/
 
-    Ozin* stareOziny = oziny;
+    /*Ozin* stareOziny = oziny;
     size_t* staryWskaznikLiczbyOzinow = wskaznikLiczbyOzinow;
-    size_t* staryWskaznikPojemnosciOzinow = wskaznikPojemnosciOzinow;
+    size_t* staryWskaznikPojemnosciOzinow = wskaznikPojemnosciOzinow;*/
 
-    oziny = ozinyObszaru;
+    Zmienna** wWPocztuGlownego = utworzZmienna(0, sizeof(Zmienna**), 2, NULL);
+    Ozin pierwszyOzin = {wWPocztuGlownego, znajdzLubDodajNazweZmiennej("@poczet", 7)};
+    size_t odnosnikWWObszaruGlownego = utworzZmiennaWObszarze(wWObszaruPowszechnego, "$glowny", sizeof(pierwszyOzin), sizeof(pierwszyOzin) * 2, 1, &pierwszyOzin);
+    Zmienna** wWObszaruGlownego = pozyskajZmiennaZObszaru(*wWObszaruPowszechnego, odnosnikWWObszaruGlownego);
+    dodajZawartoscDoZmiennej(wWPocztuGlownego, sizeof(wWObszaruGlownego), &wWObszaruGlownego);
+    przelaczNaObszar(wWObszaruGlownego);
+    //przelaczNaPoczet(wWPocztuGlownego);
+
+    /*oziny = ozinyObszaru;
     wskaznikLiczbyOzinow = &liczbaOzinowObszaru;
-    wskaznikPojemnosciOzinow = &pojemnoscOzinowObszaru;
+    wskaznikPojemnosciOzinow = &pojemnoscOzinowObszaru;*/
 
     Czastka* czastkiObszaru = (Czastka*)malloc(sizeof(Czastka));
     size_t pojemnoscCzastekObszaru = 1;
@@ -595,20 +782,25 @@ size_t wczytujJakoObszarGlowny(char** wskaznik)
         niezbywalnyBlad("Nie mozna otworzyc peku pocztu (a)");
     }*/
 
-    char* staryPoczet = poczet;
+    /*char* staryPoczet = poczet;
     size_t* staryWskaznikDlugosciPocztu = wskaznikDlugosciPocztu;
 
     size_t dlugoscPocztu = 0;
     size_t pojemnoscPocztu = 16;
     wskaznikDlugosciPocztu = &dlugoscPocztu;
     wskaznikPojemnosciPocztu = &pojemnoscPocztu;
-    poczet = malloc(pojemnoscPocztu);
+    poczet = malloc(pojemnoscPocztu);*/
 
     walkujRozgalezienie(drzewo, 1);
+    unsigned char konczace = 4;
+    dodajZawartoscDoZmiennej(wWWykonywanegoPocztu, sizeof(konczace), &konczace);
+    fprintf(pekCzytelnegoPocztu, "%s\n", nazwyPolecen[konczace]);
+
     fclose(pekCzytelnegoPocztu);
+    pekCzytelnegoPocztu = NULL;
     printf("Zakonczono walkowanie\n");
 
-    ozinyObszaru = oziny;
+    /*ozinyObszaru = oziny;
     oziny = stareOziny;
     wskaznikLiczbyOzinow = staryWskaznikLiczbyOzinow;
     wskaznikPojemnosciOzinow = staryWskaznikPojemnosciOzinow;
@@ -622,17 +814,17 @@ size_t wczytujJakoObszarGlowny(char** wskaznik)
     char odnosnikPoleceniaKonczacego = 4;
     memcpy(pamiec + r, &odnosnikPoleceniaKonczacego, 1);
     dlugoscPocztu++;
-    size_t wynik = znajdzLubUtworzZmiennaWOzinach("$glowny", r + 1, 0, 1, pamiec);
+    size_t wynik = znajdzLubUtworzZmiennaWObszarze(oziny, "$glowny", r + 1, 0, 1, pamiec);*/
 
-    free(pamiec);
-    free(ozinyObszaru);
-    free(poczet);
+    //free(pamiec);
+    //free(ozinyObszaru);
     free(czastkiObszaru);
-    wskaznikDlugosciPocztu = staryWskaznikDlugosciPocztu;
-    poczet = staryPoczet;
+    //wskaznikDlugosciPocztu = staryWskaznikDlugosciPocztu;
+    //poczet = staryPoczet;
     //printf("Przywrocono stary poczet\n");
 
     zetnijRozgalezienie(drzewo);
+    zejdz();
     //printf("Scieto drzewo\n");
 
     //printf("%d\n", wskaznikLiczbyOzinow == &liczbaOzinowObszaru);
@@ -644,7 +836,7 @@ size_t wczytujJakoObszarGlowny(char** wskaznik)
     //printf("Uwolniono oziny\n");
     //printf("Uwolniono czastki\n");
 
-    return wynik;
+    return odnosnikWWObszaruGlownego;
 }
 
 size_t wczytujJakoObszar(char** wskaznik) // nie pojawi się w pierwszym teście
@@ -661,8 +853,8 @@ size_t wczytujJakoObszar(char** wskaznik) // nie pojawi się w pierwszym teście
     size_t liczbaZmiennychObszaru = 1;
     size_t pojemnoscZmiennychObszaru = 1;
     Ozin* zmienneObszaru = (Ozin*)malloc(sizeof(Ozin) * pojemnoscZmiennychObszaru);
-    zmienneObszaru[0].odnosnik = 0;
-    zmienneObszaru[0].nazwa = 0;
+    //zmienneObszaru[0].odnosnik = 0;
+    //zmienneObszaru[0].nazwa = 0;
     while(polozenie < koniec && isspace((unsigned char)polozenie[0])) polozenie++;
     if(polozenie[0] == '(')
     {
@@ -684,7 +876,7 @@ size_t wczytujJakoObszar(char** wskaznik) // nie pojawi się w pierwszym teście
                 zmienneObszaru = (Ozin*)realloc(zmienneObszaru, sizeof(Ozin)* pojemnoscZmiennychObszaru);
                 if(zmienneObszaru == NULL) niezbywalnyBlad("Brak pamieci");
             }
-            zmienneObszaru[liczbaZmiennychObszaru].odnosnik = odnosnik;
+            //zmienneObszaru[liczbaZmiennychObszaru].odnosnik = odnosnik;
             //zmienneObszaru[liczbaZmiennychObszaru++].nazwa = zawartosc(zmienne[odnosnik]);
 
             while(polozenie < koniec && isspace((unsigned char)polozenie[0])) polozenie++;
@@ -781,7 +973,7 @@ size_t wczytujJakoLiczbe(char** wskaznik)
         niezbywalnyBlad("Blad eksportu liczby");
     }
     //size_t wynik = utworzZmienna(rozmiar, 1, 2, surowa);
-    size_t wynik = znajdzLubUtworzZmiennaWOzinach("!lic", rozmiar, 1, 2, surowa);
+    size_t wynik = znajdzLubUtworzZmiennaWObszarze(wWWykonywanegoObszaru, "!lic", rozmiar, 1, 3, surowa);
     //printf("Utworzono zmienna na miejscu %zu\n", wynik);
     //printf("Przed mpz_clear\n");
     mpz_clear(liczba_mpz);
@@ -801,7 +993,7 @@ size_t wczytujJakoPismo(char** wskaznik)
     while(polozenie[0] != '"') polozenie++;
     uintptr_t dlugosc = polozenie - pierwotne;
     //size_t wynik = utworzZmienna(dlugosc, 1, 3, pierwotne);
-    size_t wynik = znajdzLubUtworzZmiennaWOzinach("!pis", dlugosc, 1, 3, pierwotne);
+    size_t wynik = znajdzLubUtworzZmiennaWObszarze(wWWykonywanegoObszaru, "!pis", dlugosc, 1, 4, pierwotne);
     *wskaznik += dlugosc + 2;
     return wynik;
 }
@@ -816,14 +1008,14 @@ size_t wczytujJakoTln(char** wskaznik)
         *wskaznik += 3;
         unsigned char wartosc = 0;
         //return utworzZmienna(sizeof(wartosc), 1, 4, &wartosc);
-        return znajdzLubUtworzZmiennaWOzinach("!tln", sizeof(wartosc), 1, 4, &wartosc);
+        return znajdzLubUtworzZmiennaWObszarze(wWWykonywanegoObszaru, "!tln", sizeof(wartosc), 1, 5, &wartosc);
     }
     if(memcmp(polozenie, "tak", 3) == 0 && (pozostale == 3 || !isalpha(polozenie[3])))
     {
         *wskaznik += 3;
         unsigned char wartosc = 1;
         //return utworzZmienna(sizeof(wartosc), 1, 4, &wartosc);
-        return znajdzLubUtworzZmiennaWOzinach("!tln", sizeof(wartosc), 1, 4, &wartosc);
+        return znajdzLubUtworzZmiennaWObszarze(wWWykonywanegoObszaru, "!tln", sizeof(wartosc), 1, 5, &wartosc);
     }
     return 0;
 }
@@ -838,7 +1030,7 @@ size_t wczytujJakoNazwa(char** wskaznik)
     size_t nazwa = znajdzLubDodajNazweZmiennej(pierwotne, dlugosc);
     *wskaznik += dlugosc;
     //return utworzZmienna(sizeof(size_t), 0, 0, &(nazwyZmiennych[nazwa])); // utworzenie zmiennej odnosnik do nazwy (a nie nazwę)
-    return znajdzLubUtworzZmiennaWOzinach(nazwyZmiennych[nazwa], sizeof(size_t), 0, 0, &nazwa); // utworzenie zmiennej odnosnik do nazwy (a nie nazwę)
+    return znajdzLubUtworzZmiennaWObszarze(wWWykonywanegoObszaru, nazwyZmiennych[nazwa], sizeof(size_t), 0, 0, &nazwa); // utworzenie zmiennej odnosnik do nazwy (a nie nazwę)
 }
 
 char* wczytujKluczowe(char** wskaznik)
@@ -904,7 +1096,7 @@ Czastka wczytujNastepne(char** wskaznik)
     if(wynik)
     {
         Czastka c = {2, wynik};
-        printf("Wczytano zmienna: %zu (nazwa: %s)\n", (size_t)wynik, nazwyZmiennych[oziny[(size_t)wynik].nazwa]);
+        printf("Wczytano zmienna: %zu (nazwa: %s)\n", (size_t)wynik, nazwyZmiennych[pozyskajOdnosnikNazwyZObszaru(*wWWykonywanegoObszaru, (size_t)wynik)]);
         return c;
     }
     printf("Wczytano nieznany: %c\n", **wskaznik);
@@ -950,7 +1142,7 @@ void wzywanie(char* nazwa)
     printf("Koniec wczytywania polecen\n");
 
     DostosujKon dostosuj = (DostosujKon)GetProcAddress(uchwytDll, "dostosuj"); // jeśli taka funkcja jest to ją wywołujemy
-    if(dostosuj) dostosuj(sciagnijZmienne, sciagnijNazwyZmiennych, sciagnijPoczet);
+    if(dostosuj) dostosuj(sciagnijObszarPowszechny, sciagnijNazwyZmiennych, sciagnijPoczet);
     if(dostosuj) printf("Wywolano dostosowywanie\n");
 
     dllDoZwolnienia = (HMODULE*)realloc(dllDoZwolnienia, sizeof(HMODULE) * (liczbaDllDoZwolnienia + 1));
@@ -990,19 +1182,21 @@ void tlumacz()
 
 void czytaj()
 {
-    przelaczNaObszar(zmienne[23], NULL);
-    *wskaznikOdnosnikaPolecenia = 0;
+    //przelaczNaObszar(zmienne[23], NULL);
+    Zmienna** znalezionyObszar = znajdzZmiennaWObszarze(wWObszaruPowszechnego, znajdzLubDodajNazweZmiennej("$glowny", 0));
+    printf("Zaraz przelaczymy na obszar %p\n", znalezionyObszar);
+    przelaczNaObszar(znalezionyObszar);
     printf("Przelaczano na obszar glowny\n");
     //niezbywalnyBlad("Koniec testu");
 }
 
 void zakoncz()
 {
-    for(size_t i = 1; i < liczbaZmiennych; i++)
+    /*for(size_t i = 1; i < liczbaZmiennych; i++)
     {
         if(zmienne[i]) free(zmienne[i]);
     }
-    if(zmienne) free(zmienne);
+    if(zmienne) free(zmienne);*/
     for(size_t i = 1; i < liczbaNazwZmiennych; i++)
     {
         if(nazwyZmiennych[i]) free(nazwyZmiennych[i]);
@@ -1037,11 +1231,11 @@ int main(int argc, char *argv[])
 
     size_t dlugosc = strlen(argv[1]);
 
-    size_t obszarPrzygotowawczy = 0;
+    size_t poczetPrzygotowawczy = 0;
     if(dlugosc > 4 && strcmp(argv[1] + dlugosc - 4, ".czp") == 0) przygotowanieDlaCzp();
-    else if(dlugosc > 3 && strcmp(argv[1] + dlugosc - 3, ".cz") == 0) obszarPrzygotowawczy = przygotowanieDlaCz();
+    else if(dlugosc > 3 && strcmp(argv[1] + dlugosc - 3, ".cz") == 0) poczetPrzygotowawczy = przygotowanieDlaCz();
     else niezbywalnyBlad("Wymagany pek .czp lub .cz");
-    printf("Zapisano obszar przygotowawczy na miejscu %zu\n", obszarPrzygotowawczy);
+    printf("Zapisano poczet przygotowawczy na miejscu %zu\n", poczetPrzygotowawczy);
 
     char sciezka[MAX_PATH];
     strncpy(sciezka, argv[1], sizeof(sciezka));
@@ -1051,6 +1245,10 @@ int main(int argc, char *argv[])
     char folder[MAX_PATH];
     snprintf(folder, sizeof(folder), "%s%s", dysk, kat);
     SetCurrentDirectoryA(folder);
+
+    pojemnoscStosuWyjsc = 2;
+    stosWyjsc = realloc(stosWyjsc, pojemnoscStosuWyjsc * sizeof(ZmiennaILiczba));
+    if(!stosWyjsc) niezbywalnyBlad("Brak pamieci");
 
     polecenia = (Polecenie*)malloc(sizeof(Polecenie) * pojemnoscPolecen);
     if(!polecenia) niezbywalnyBlad("Brak pamieci");
@@ -1069,20 +1267,19 @@ int main(int argc, char *argv[])
 
     liczbaPolecen = 5;
 
-    size_t odnosnikaPolecenia = 0;
-    wskaznikOdnosnikaPolecenia = &odnosnikaPolecenia;
-
     printf("Wzywanie podstawy.dll\n");
     wzywanie("podstawy.dll");
 
-    przelaczNaObszar(zmienne[obszarPrzygotowawczy], NULL);
+    //przelaczNaObszar(zmienne[obszarPrzygotowawczy], NULL);
+    przelaczNaObszar(wWObszaruPowszechnego);
+    przelaczNaPoczet(pozyskajZmiennaZObszaru(*wWObszaruPowszechnego, poczetPrzygotowawczy));
 
     printf("Rozpoczeto wykonywanie\n");
     while(TRUE)
     {
-        printf("Zaraz wykonamy polecenie %s (%d)", nazwyPolecen[poczet[*wskaznikOdnosnikaPolecenia]], poczet[*wskaznikOdnosnikaPolecenia]);
+        printf("Zaraz wykonamy polecenie %s (%d)", nazwyPolecen[poczet[odnosnikPolecenia]], poczet[odnosnikPolecenia]);
         getchar();
-        polecenia[poczet[(*wskaznikOdnosnikaPolecenia)++]]();
+        polecenia[poczet[odnosnikPolecenia++]]();
         printf("Powrot do petli w main\n");
         getchar();
     }
