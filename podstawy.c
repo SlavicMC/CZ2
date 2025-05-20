@@ -9,9 +9,14 @@
 
 #include "powszechne.h"
 
+Ozin** wskaznikOzinow = NULL;
+
 char** wskaznikPocztu = NULL;
 size_t* wskaznikOdnosnikaPolecenia = NULL;
 
+void (*ustawZawartoscZmiennej)(Zmienna**, size_t, void*) = NULL;
+
+void (*zwolnijPamiecZMpz)(void *, size_t);
 
 void __declspec(dllexport) rowne_dz()
 {
@@ -81,8 +86,53 @@ void __declspec(dllexport) nreszta_dz()
 
 void __declspec(dllexport) dodaj_dz()
 {
+    // Log (tymczasowy)
     printf("Wywolano dodaj\n");
+    // Pozyskujemy wskaźnik do wartości z pocztu i rzutujemy je na size_t
+    Ozin* oziny = *wskaznikOzinow;
+    size_t* wartosci = (size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia);
+    // Wyciągamy zmienne z ozinów
+    Zmienna** wynik = oziny[wartosci[0]].wWZmiennej;
+    Zmienna** z1 = oziny[wartosci[1]].wWZmiennej;
+    Zmienna** z2 = oziny[wartosci[2]].wWZmiennej;
+    // Przekształcamy je na mpz do obliczeń
+    mpz_t wynik_mpz, z1_mpz, z2_mpz;
+    mpz_init(wynik_mpz);
+    mpz_init(z1_mpz);
+    mpz_init(z2_mpz);
+    // Wpisujemy wartości liczb ze zmiennych
+    mpz_import(z1_mpz, (*z1)->rozmiar, 1, 1, 0, 0, zawartosc(*z1));
+    mpz_import(z2_mpz, (*z2)->rozmiar, 1, 1, 0, 0, zawartosc(*z2));
+    // Wykonujemy działanie
+    mpz_add(wynik_mpz, z1_mpz, z2_mpz);
+    // Log (tymczasowy)
+    char* str1 = mpz_get_str(NULL, 10, z1_mpz);
+    char* str2 = mpz_get_str(NULL, 10, z2_mpz);
+    char* str3 = mpz_get_str(NULL, 10, wynik_mpz);
+    printf("Z1: %s\nZ2: %s\nWynik: %s\n", str1, str2, str3);
+    zwolnijPamiecZMpz(str1, strlen(str1) + 1);
+    zwolnijPamiecZMpz(str2, strlen(str2) + 1);
+    zwolnijPamiecZMpz(str3, strlen(str3) + 1);
+    // Ustawiamy zawartość wyniku
+    size_t rozmiar;
+    void* surowa = mpz_export(NULL, &rozmiar, 1, 1, 0, 0, wynik_mpz);
+    ustawZawartoscZmiennej(wynik, rozmiar, surowa);
+    printf("Ustawiono zawartosc\n");
+    // Zwalnianie pamięci
+    zwolnijPamiecZMpz(surowa, rozmiar);
+    mpz_clear(wynik_mpz);
+    mpz_clear(z1_mpz);
+    mpz_clear(z2_mpz);
+    // Przesuwamy poczet o 3 * size_t
     *wskaznikOdnosnikaPolecenia += 3 * sizeof(size_t);
+    // Log (dla upewnienia się że zapisano dane poprawnie, tymczasowy)
+    mpz_t log;
+    mpz_init(log);
+    mpz_import(log, (*wynik)->rozmiar, 1, 1, 0, 0, zawartosc(*wynik));
+    char* str = mpz_get_str(NULL, 10, log);
+    printf("Pomyslnie zapisano wynik: %s\n", str);
+    zwolnijPamiecZMpz(str, strlen(str) + 1);
+    mpz_clear(log);
 }
 
 void __declspec(dllexport) odejmij_dz()
@@ -153,10 +203,13 @@ void __declspec(dllexport) skok_wjk()
 
 // kluczowa zawartość dll
 
-void __declspec(dllexport) dostosuj(SciagnijObszarPowszechnyKon sopk, SciagnijNazwyZmiennychKon snzk, SciagnijPoczetKon spk) // dostosowywuje dll
+void __declspec(dllexport) dostosuj(SciagnijObszaryKon sok, SciagnijNazwyZmiennychKon snzk, SciagnijPoczetKon spk, SciagnijZarzadzanieZmiennymiKon szzk) // dostosowywuje dll
 {
     //spk(&wskaznikPocztu, &wskaznikWskaznikaOdnosnikaPolecenia, &wskaznikWskaznikaDlugosciPocztu, &wskaznikWskaznikaPojemnosciPocztu);
-    spk(&wskaznikPocztu, &wskaznikOdnosnikaPolecenia);
+    sok(NULL, NULL, NULL, &wskaznikOzinow);
+    spk(NULL, &wskaznikPocztu, &wskaznikOdnosnikaPolecenia);
+    szzk(NULL, &ustawZawartoscZmiennej);
+    mp_get_memory_functions(NULL, NULL, &zwolnijPamiecZMpz);
 }
 
 __declspec(dllexport) char* nazwyPrzenoszonychPolecen[] = { // nazwy poleceń przenoszonych
@@ -186,5 +239,33 @@ __declspec(dllexport) char* nazwyPrzenoszonychPolecen[] = { // nazwy poleceń pr
 
     "skok_wjk"
 };
+
+/*__declspec(dllexport) char* wymaganiaPrzenoszonychPolecen[] = { // wymagania czyli ilość bajtów jaką 
+    "rowne_dz",
+    "rozne_dz",
+    "wieksze_badz_rowne_dz",
+    "mniejsze_badz_rowne_dz",
+    "lub_dz",
+    "i_dz",
+    "ndodaj_dz",
+    "nodejmij_dz",
+    "nmnoz_dz",
+    "ndziel_dz",
+    "nreszta_dz",
+    "dodaj_dz",
+    "odejmij_dz",
+    "mnoz_dz",
+    "dziel_dz",
+    "reszta_dz",
+    "nadaj_dz",
+    "nie_dz",
+    "wieksze_dz",
+    "mniejsze_dz",
+
+    "jesli_klc",
+    "poki_klc",
+
+    "skok_wjk"
+};*/
 
 __declspec(dllexport) size_t liczbaPrzenoszonychPolecen = sizeof(nazwyPrzenoszonychPolecen)/sizeof(nazwyPrzenoszonychPolecen[0]); // ich liczba
