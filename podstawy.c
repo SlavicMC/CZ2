@@ -117,6 +117,7 @@ void __declspec(dllexport) dodaj_dz()
     size_t rozmiar;
     void* surowa = mpz_export(NULL, &rozmiar, 1, 1, 0, 0, wynik_mpz);
     ustawZawartoscZmiennej(wynik, rozmiar, surowa);
+    (*wynik)->rod = (*z1)->rod;
     printf("Ustawiono zawartosc\n");
     // Zwalnianie pamięci
     zwolnijPamiecZMpz(surowa, rozmiar);
