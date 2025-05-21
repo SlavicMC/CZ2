@@ -36,14 +36,14 @@ typedef struct
 
 typedef struct
 {
-    unsigned char rodzaj;               // 0 - nieznany, 1 - słowo kluczowe, 2 - zmienna, 3 - działanie
+    unsigned char rodzaj;               // 0 - nieznany, 1 - słowo kluczowe, 2 - zmienna, 3 - działanie, 4 - surowe polecenie
     uintptr_t zawartosc;                // wskaźnik lub odnośnik do danych
 } Czastka;
 
 typedef struct
 {
     int rodzaj;
-    size_t wartosc;
+    uintptr_t wartosc;
     void* lewa;
     void* prawa;
 } GalazPodwojna;

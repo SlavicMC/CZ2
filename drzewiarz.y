@@ -3,6 +3,7 @@
 #include "powszechne.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 extern int yylex(void);
 void yyerror(const char *s);
@@ -16,11 +17,13 @@ Rozgalezienie* drzewo = NULL;
 
 %union {
     size_t zmienna;
+    char* polecenie;
     GalazPodwojna* galazPodwojna;
     Rozgalezienie* rozgalezienie;
 }
 
 %token <zmienna> ZMIENNA
+%token <polecenie> POLECENIE
 %token JESLI POKI
 %token DODAJ ODEJMIJ MNOZ DZIEL RESZTA
 %token NADAJ NDODAJ NODEJMIJ NMNOZ NDZIEL NRESZTA
@@ -52,6 +55,7 @@ wyrazenia:
 
 wyrazenie:
       dzialanie SREDNIK                                             { $$ = $1; }
+    | POLECENIE                                                     { $$ = utworzPolecenieJakoGalaz($1); }
     | JESLI LNAWIAS dzialanie PNAWIAS LSPIECIE wyrazenia PSPIECIE   { $$ = utworzWyrazenieKluczowe(JESLI, $3, $6); }
     | JESLI LNAWIAS dzialanie PNAWIAS wyrazenie                     { $$ = utworzWyrazenieKluczowe(JESLI, $3, pojedynczeRozgalezienie($5)); }
     | POKI LNAWIAS dzialanie PNAWIAS LSPIECIE wyrazenia PSPIECIE    { $$ = utworzWyrazenieKluczowe(POKI, $3, $6); }
@@ -86,6 +90,7 @@ dzialanie:
 %%
 
 int zmienniana = ZMIENNA;
+int poleceniana = POLECENIE;
 int kluczowe[] = { 0, JESLI, POKI};
 size_t liczbaSlowKluczowych = sizeof(kluczowe)/sizeof(kluczowe[0]);
 // char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+=", "-=", "*=", "/=", "%=", "+", "-", "*", "/", "%", "=", "!", ">", "<"};
@@ -101,11 +106,27 @@ GalazPodwojna* utworzZmiennaJakoGalaz(size_t z)
         exit(EXIT_FAILURE);
     }
     galaz->rodzaj = ZMIENNA;
-    galaz->wartosc = z;
+    galaz->wartosc = (uintptr_t)z;
     galaz->lewa = NULL;
     galaz->prawa = NULL;
     return galaz;
 }
+
+GalazPodwojna* utworzPolecenieJakoGalaz(char* p)
+{
+    GalazPodwojna* galaz = malloc(sizeof(GalazPodwojna));
+    if(!galaz)
+    {
+        fprintf(stderr, "Brak pamieci\n");
+        exit(EXIT_FAILURE);
+    }
+    galaz->rodzaj = POLECENIE;
+    galaz->wartosc = (uintptr_t)p;
+    galaz->lewa = NULL;
+    galaz->prawa = NULL;
+    return galaz;
+}
+
 
 Rozgalezienie* utworzRozgalezienie()
 {
@@ -174,7 +195,7 @@ int yylex(void)
         yylval.zmienna = 0;
         //printf("Wyslano nieznany: %c\n", ((char*)czastka.zawartosc)[0]);
         //getchar();
-        switch (((char*)czastka.zawartosc)[0]) // nieznany to zawsze jeden bajt
+        switch (*((char*)czastka.zawartosc)) // nieznany to zawsze jeden bajt
         {
             case ';': return SREDNIK;
             case '(': return LNAWIAS;
@@ -187,7 +208,7 @@ int yylex(void)
                 exit(EXIT_FAILURE);
         }
     }
-    if(czastka.rodzaj == 1) // słowo kluczowe
+    else if(czastka.rodzaj == 1) // słowo kluczowe
     {
         yylval.zmienna = 0;
         for(int i = 1; i < sizeof(kluczowe) / sizeof(int); i++)
@@ -208,7 +229,7 @@ int yylex(void)
         getchar();
         exit(EXIT_FAILURE);
     }
-    if(czastka.rodzaj == 3) // działanie
+    else if(czastka.rodzaj == 3) // działanie
     {
         yylval.zmienna = 0;
 
@@ -230,7 +251,12 @@ int yylex(void)
         getchar();
         exit(EXIT_FAILURE);
     }
-    if(czastka.rodzaj == 2) // zmienna
+    else if(czastka.rodzaj == 4) // surowe polecenie
+    {
+        yylval.polecenie = (char*)czastka.zawartosc;
+        return POLECENIE;
+    }
+    else if(czastka.rodzaj == 2) // zmienna
     {
         yylval.zmienna = czastka.zawartosc;
         //printf("Wyslano zmienna: %zu\n", (size_t)czastka.zawartosc);
@@ -311,6 +337,7 @@ void zetnijRozgalezienie(Rozgalezienie* rozgalezienie)
 const char* nazwaRodzaju(int rodzaj)
 {
     if(rodzaj == ZMIENNA) return "ZMIENNA";
+    if(rodzaj == POLECENIE) return "POLECENIE";
     for(size_t i = 0; i < sizeof(dzialaniowe)/sizeof(dzialaniowe[0]); i++)
     {
         if(dzialaniowe[i] == rodzaj) return dzialania[i];
@@ -330,9 +357,13 @@ void wypiszGalaz(GalazPodwojna* galaz, int wciecie)
 
     printf("Rodzaj: %s", nazwaRodzaju(galaz->rodzaj));
 
-    if (galaz->rodzaj == ZMIENNA)
+    if(galaz->rodzaj == ZMIENNA)
     {
         printf(", Zmienna #%zu\n", galaz->wartosc);
+    }
+    else if(galaz->rodzaj == POLECENIE)
+    {
+        printf("\n");
     }
     else if(galaz->rodzaj == JESLI || galaz->rodzaj == POKI)
     {

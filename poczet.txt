@@ -1,6 +1,7 @@
 dodaj_dz 16 1 2
 nadaj_dz 16 3 4
 nadaj_dz 16 5 6
+dodaj_dz 3 1 2
 dodaj_dz 18 3 5
 rowne_dz 17 7 18
 wieksze_badz_rowne_dz 19 5 3
@@ -16,5 +17,5 @@ nie_dz 19 13
 i_dz 16 17 19
 poki_klc 16
 nmnoz_dz 16 5 8
-skok_wjk 325
+skok_wjk 350
 zakoncz_dom

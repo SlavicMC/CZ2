@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "powszechne.h"
 #include "dzielone.h"
@@ -66,6 +67,7 @@ char* nazwyPolecenDzialan[] = {"rowne_dz", "rozne_dz", "wieksze_badz_rowne_dz", 
 
 Polecenie* polecenia = NULL;
 char** nazwyPolecen = NULL;
+size_t* dlugosciWywodowPolecen = NULL;
 size_t liczbaPolecen = 0;
 size_t pojemnoscPolecen = 8;
 
@@ -393,7 +395,21 @@ size_t walkujGalazPodwojna(GalazPodwojna* galaz, size_t liczbaZmiennychTymczasow
     if(!galaz) return 0;
     if(galaz->rodzaj == zmienniana)
     {
-        return galaz->wartosc;
+        return (size_t)galaz->wartosc;
+    }
+    if(galaz->rodzaj == poleceniana)
+    {
+        char* zawartosc = (char*)galaz->wartosc;
+        size_t dlugosc = dlugosciWywodowPolecen[*zawartosc];
+        dodajZawartoscDoZmiennej(wWWykonywanegoPocztu, 1 + dlugosc, zawartosc);
+        fprintf(pekCzytelnegoPocztu, "%s", nazwyPolecen[*zawartosc]);
+        for(size_t i = 0; i < dlugosc; i += 8)
+        {
+            fprintf(pekCzytelnegoPocztu, " %zu", *((size_t*)(zawartosc + i + 1)));
+        }
+        fprintf(pekCzytelnegoPocztu, "\n");
+        free(zawartosc);
+        return 0;
     }
     for(size_t i = 1; i < liczbaSlowKluczowych; i++) // pierwsze słowo kluczowe pomijamy bo jest ono przetwarzane nieco inaczej
     {
@@ -737,6 +753,7 @@ size_t przygotowanieDlaCz()
 
 Czastka wczytujNastepne(char** wskaznik);
 size_t wczytujJakoNazwa(char** wskaznik);
+size_t wczytujZmienne(char** wskaznik);
 
 size_t wczytujJakoObszarGlowny(char** wskaznik)
 {
@@ -1027,9 +1044,9 @@ size_t wczytujJakoLiczbe(char** wskaznik)
 size_t wczytujJakoPismo(char** wskaznik)
 {
     char* polozenie = *wskaznik;
-    if(polozenie[0] != '"') return 0;
+    if(*polozenie != '"') return 0;
     char* pierwotne = ++polozenie;
-    while(polozenie[0] != '"') polozenie++;
+    while(*polozenie != '"') polozenie++;
     uintptr_t dlugosc = polozenie - pierwotne;
     //size_t wynik = utworzZmienna(dlugosc, 1, 3, pierwotne);
     size_t wynik = znajdzLubUtworzZmiennaWObszarze(wWWykonywanegoObszaru, "!pis", dlugosc, 1, 4, pierwotne);
@@ -1072,6 +1089,66 @@ size_t wczytujJakoNazwa(char** wskaznik)
     return znajdzLubUtworzZmiennaWObszarze(wWWykonywanegoObszaru, nazwyZmiennych[nazwa], sizeof(size_t), 0, 0, &nazwa); // utworzenie zmiennej odnosnik do nazwy (a nie nazwę)
 }
 
+char* wczytujPolecenie(char** wskaznik)
+{
+    char* polozenie = *wskaznik;
+    if(*polozenie != '$') return NULL;
+    polozenie++;
+    while(polozenie < koniec && isspace(*polozenie)) polozenie++;
+    if(!isalpha(*polozenie) && *polozenie != '_') return NULL;
+    char* poczatekNazwyPolecenia = polozenie;
+    while(isalpha(*polozenie) || *polozenie == '_' || isdigit(*polozenie)) polozenie++;
+    size_t dlugosc = polozenie - poczatekNazwyPolecenia;
+    unsigned char odnosnikPolecenia = 0; // 0 to nieprawidłowe polecenie (w tablicy ma wartość NULL)
+    for(unsigned char j = 1; j < liczbaPolecen; j++)
+    {
+        if(strncmp(nazwyPolecen[j], poczatekNazwyPolecenia, dlugosc) == 0)
+        {
+            odnosnikPolecenia = j;
+            break;
+        }
+    }
+    if(!odnosnikPolecenia) niezbywalnyBlad("Nie znaleziono polecenia");
+    size_t pozostalaDlugoscWywodu = dlugosciWywodowPolecen[odnosnikPolecenia];
+    size_t polozenieWywodu = 1;
+    char* pamiec = malloc(sizeof(odnosnikPolecenia) + pozostalaDlugoscWywodu);
+    if(!pamiec) niezbywalnyBlad("Brak pamieci");
+    pamiec[0] = odnosnikPolecenia;
+    while(pozostalaDlugoscWywodu)
+    {
+        while(polozenie < koniec && isspace(*polozenie)) polozenie++;
+        if(pozostalaDlugoscWywodu >= sizeof(size_t))
+        {
+            size_t zmienna;
+            if(*polozenie == '$')
+            {
+                polozenie++;
+                while(polozenie < koniec && isspace(*polozenie)) polozenie++;
+                if(!isdigit(*polozenie)) niezbywalnyBlad("Nieprawidlowa wartosc w wywodzie polecenia");
+                char* poczatekLiczby = polozenie;
+                while(polozenie < koniec && isdigit(*polozenie)) polozenie++;
+                errno = 0;
+                zmienna = strtoull(poczatekLiczby, &polozenie, 10);
+                if(polozenie == poczatekLiczby || errno == ERANGE || zmienna > SIZE_MAX) niezbywalnyBlad("Blad wczytywania wartosci wywodu polecenia");
+                memcpy(pamiec + polozenieWywodu, &zmienna, sizeof(zmienna));
+                polozenieWywodu += sizeof(zmienna);
+                pozostalaDlugoscWywodu -= sizeof(zmienna);
+                continue;
+            }
+            zmienna = wczytujZmienne(&polozenie);
+            if(zmienna)
+            {
+                memcpy(pamiec + polozenieWywodu, &zmienna, sizeof(zmienna));
+                polozenieWywodu += sizeof(zmienna);
+                pozostalaDlugoscWywodu -= sizeof(zmienna);
+                continue;
+            }
+        }
+        else niezbywalnyBlad("Nieprawidlowy wywod polecenia");
+    }
+    *wskaznik = polozenie;
+    return pamiec;
+}
 
 char* wczytujKluczowe(char** wskaznik)
 {
@@ -1118,6 +1195,13 @@ size_t wczytujZmienne(char** wskaznik)
 Czastka wczytujNastepne(char** wskaznik)
 {
     uintptr_t wynik;
+    wynik = (uintptr_t)wczytujPolecenie(wskaznik);
+    if(wynik)
+    {
+        Czastka c = {4, wynik};
+        printf("Wczytano polecenie: %s\n", nazwyPolecen[*((char*)wynik)]);
+        return c;
+    }
     wynik = (uintptr_t)wczytujKluczowe(wskaznik);
     if(wynik)
     {
@@ -1153,9 +1237,10 @@ void wzywanie(char* nazwa)
 
     //char*** wskaznikNazwPrzenoszonychPolecen = (char***)GetProcAddress(uchwytDll, "nazwyPrzenoszonychPolecen");
     char** nazwyPrzenoszonychPolecen = (char**)GetProcAddress(uchwytDll, "nazwyPrzenoszonychPolecen");
+    size_t* dlugosciWywodowPrzenoszonychPolecen = (size_t*)GetProcAddress(uchwytDll, "dlugosciWywodowPrzenoszonychPolecen");
     size_t* wskaznikLiczbyPrzenoszonychPolecen = (size_t*)GetProcAddress(uchwytDll, "liczbaPrzenoszonychPolecen");
 
-    if(nazwyPrzenoszonychPolecen && wskaznikLiczbyPrzenoszonychPolecen) // jeśli oba zosatły wczytane przenosimy polecenia (ich obecność nie jest obowiązkowa)
+    if(nazwyPrzenoszonychPolecen && dlugosciWywodowPrzenoszonychPolecen && wskaznikLiczbyPrzenoszonychPolecen) // jeśli zosatły wczytane przenosimy polecenia (ich obecność nie jest obowiązkowa)
     {
         printf("Pomyslnie pozyskano nazwy, rozpoczynam wczytywanie\n");
         //char** nazwyPrzenoszonychPolecen = *wskaznikNazwPrzenoszonychPolecen;
@@ -1171,11 +1256,13 @@ void wzywanie(char* nazwa)
                     pojemnoscPolecen *= 2;
                     polecenia = (Polecenie*)realloc(polecenia, sizeof(Polecenie) * pojemnoscPolecen);
                     nazwyPolecen = (char**)realloc(nazwyPolecen, sizeof(char*) * pojemnoscPolecen);
-                    if(!polecenia || !nazwyPolecen) niezbywalnyBlad("Brak pamieci");
+                    dlugosciWywodowPolecen = (size_t*)realloc(dlugosciWywodowPolecen, sizeof(size_t) * pojemnoscPolecen);
+                    if(!polecenia || !nazwyPolecen || !dlugosciWywodowPolecen) niezbywalnyBlad("Brak pamieci");
                 }
                 polecenia[liczbaPolecen] = p;
+                nazwyPolecen[liczbaPolecen] = nazwyPrzenoszonychPolecen[i];
+                dlugosciWywodowPolecen[liczbaPolecen++] = dlugosciWywodowPrzenoszonychPolecen[i];
                 printf("Pomyslnie pozyskano polecenie %s\n", nazwyPrzenoszonychPolecen[i]);
-                nazwyPolecen[liczbaPolecen++] = nazwyPrzenoszonychPolecen[i];
             }
         }
     }
@@ -1309,6 +1396,13 @@ int main(int argc, char *argv[])
     nazwyPolecen[2] = "tlumacz_dom";
     nazwyPolecen[3] = "czytaj_dom";
     nazwyPolecen[4] = "zakoncz_dom";
+
+    dlugosciWywodowPolecen = (size_t*)malloc(sizeof(size_t) * pojemnoscPolecen);
+    dlugosciWywodowPolecen[0] = 0;
+    dlugosciWywodowPolecen[1] = 0;
+    dlugosciWywodowPolecen[2] = 0;
+    dlugosciWywodowPolecen[3] = 0;
+    dlugosciWywodowPolecen[4] = 0;
 
     liczbaPolecen = 5;
 

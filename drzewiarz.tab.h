@@ -55,33 +55,34 @@ extern int yydebug;
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
     ZMIENNA = 258,                 /* ZMIENNA  */
-    JESLI = 259,                   /* JESLI  */
-    POKI = 260,                    /* POKI  */
-    DODAJ = 261,                   /* DODAJ  */
-    ODEJMIJ = 262,                 /* ODEJMIJ  */
-    MNOZ = 263,                    /* MNOZ  */
-    DZIEL = 264,                   /* DZIEL  */
-    RESZTA = 265,                  /* RESZTA  */
-    NADAJ = 266,                   /* NADAJ  */
-    NDODAJ = 267,                  /* NDODAJ  */
-    NODEJMIJ = 268,                /* NODEJMIJ  */
-    NMNOZ = 269,                   /* NMNOZ  */
-    NDZIEL = 270,                  /* NDZIEL  */
-    NRESZTA = 271,                 /* NRESZTA  */
-    NIE = 272,                     /* NIE  */
-    ROWNE = 273,                   /* ROWNE  */
-    ROZNE = 274,                   /* ROZNE  */
-    WIEKSZE = 275,                 /* WIEKSZE  */
-    MNIEJSZE = 276,                /* MNIEJSZE  */
-    WIEKSZE_BADZ_ROWNE = 277,      /* WIEKSZE_BADZ_ROWNE  */
-    MNIEJSZE_BADZ_ROWNE = 278,     /* MNIEJSZE_BADZ_ROWNE  */
-    I = 279,                       /* I  */
-    LUB = 280,                     /* LUB  */
-    SREDNIK = 281,                 /* SREDNIK  */
-    LNAWIAS = 282,                 /* LNAWIAS  */
-    PNAWIAS = 283,                 /* PNAWIAS  */
-    LSPIECIE = 284,                /* LSPIECIE  */
-    PSPIECIE = 285                 /* PSPIECIE  */
+    POLECENIE = 259,               /* POLECENIE  */
+    JESLI = 260,                   /* JESLI  */
+    POKI = 261,                    /* POKI  */
+    DODAJ = 262,                   /* DODAJ  */
+    ODEJMIJ = 263,                 /* ODEJMIJ  */
+    MNOZ = 264,                    /* MNOZ  */
+    DZIEL = 265,                   /* DZIEL  */
+    RESZTA = 266,                  /* RESZTA  */
+    NADAJ = 267,                   /* NADAJ  */
+    NDODAJ = 268,                  /* NDODAJ  */
+    NODEJMIJ = 269,                /* NODEJMIJ  */
+    NMNOZ = 270,                   /* NMNOZ  */
+    NDZIEL = 271,                  /* NDZIEL  */
+    NRESZTA = 272,                 /* NRESZTA  */
+    NIE = 273,                     /* NIE  */
+    ROWNE = 274,                   /* ROWNE  */
+    ROZNE = 275,                   /* ROZNE  */
+    WIEKSZE = 276,                 /* WIEKSZE  */
+    MNIEJSZE = 277,                /* MNIEJSZE  */
+    WIEKSZE_BADZ_ROWNE = 278,      /* WIEKSZE_BADZ_ROWNE  */
+    MNIEJSZE_BADZ_ROWNE = 279,     /* MNIEJSZE_BADZ_ROWNE  */
+    I = 280,                       /* I  */
+    LUB = 281,                     /* LUB  */
+    SREDNIK = 282,                 /* SREDNIK  */
+    LNAWIAS = 283,                 /* LNAWIAS  */
+    PNAWIAS = 284,                 /* PNAWIAS  */
+    LSPIECIE = 285,                /* LSPIECIE  */
+    PSPIECIE = 286                 /* PSPIECIE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -90,13 +91,14 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 17 "drzewiarz.y"
+#line 18 "drzewiarz.y"
 
     size_t zmienna;
+    char* polecenie;
     GalazPodwojna* galazPodwojna;
     Rozgalezienie* rozgalezienie;
 
-#line 100 "drzewiarz.tab.h"
+#line 102 "drzewiarz.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

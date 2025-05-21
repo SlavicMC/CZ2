@@ -20,6 +20,7 @@ extern char* dzialania[];
 extern size_t liczbaDzialan;
 
 extern int zmienniana;
+extern int poleceniana;
 extern int kluczowe[];
 extern int dzialaniowe[];
 
@@ -38,6 +39,7 @@ void wypiszDrzewo(Rozgalezienie* rozgalezienie, int wciecie);
 GalazPodwojna* utworzDzialanie(int dz, GalazPodwojna* lewy, GalazPodwojna* prawy);
 GalazPodwojna* utworzWyrazenieKluczowe(int dz, GalazPodwojna* lewy, Rozgalezienie* prawy);
 GalazPodwojna* utworzZmiennaJakoGalaz(size_t z);
+GalazPodwojna* utworzPolecenieJakoGalaz(char* p);
 
 #ifdef __cplusplus
 }
