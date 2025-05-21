@@ -212,7 +212,8 @@ void __declspec(dllexport) dostosuj(SciagnijObszaryKon sok, SciagnijNazwyZmienny
     mp_get_memory_functions(NULL, NULL, &zwolnijPamiecZMpz);
 }
 
-__declspec(dllexport) char* nazwyPrzenoszonychPolecen[] = { // nazwy poleceń przenoszonych
+// nazwy poleceń przenoszonych
+__declspec(dllexport) char* nazwyPrzenoszonychPolecen[] = {
     "rowne_dz",
     "rozne_dz",
     "wieksze_badz_rowne_dz",
@@ -240,32 +241,33 @@ __declspec(dllexport) char* nazwyPrzenoszonychPolecen[] = { // nazwy poleceń pr
     "skok_wjk"
 };
 
-/*__declspec(dllexport) char* wymaganiaPrzenoszonychPolecen[] = { // wymagania czyli ilość bajtów jaką 
-    "rowne_dz",
-    "rozne_dz",
-    "wieksze_badz_rowne_dz",
-    "mniejsze_badz_rowne_dz",
-    "lub_dz",
-    "i_dz",
-    "ndodaj_dz",
-    "nodejmij_dz",
-    "nmnoz_dz",
-    "ndziel_dz",
-    "nreszta_dz",
-    "dodaj_dz",
-    "odejmij_dz",
-    "mnoz_dz",
-    "dziel_dz",
-    "reszta_dz",
-    "nadaj_dz",
-    "nie_dz",
-    "wieksze_dz",
-    "mniejsze_dz",
+// ilość bajtów jaką wymaga każde polecenie (nie licząc własnego odnośnika)
+__declspec(dllexport) size_t dlugosciWywodowPrzenoszonychPolecen[] = {
+    3 * sizeof(size_t), // "rowne_dz",
+    3 * sizeof(size_t), // "rozne_dz",
+    3 * sizeof(size_t), // "wieksze_badz_rowne_dz",
+    3 * sizeof(size_t), // "mniejsze_badz_rowne_dz",
+    3 * sizeof(size_t), // "lub_dz",
+    3 * sizeof(size_t), // "i_dz",
+    3 * sizeof(size_t), // "ndodaj_dz",
+    3 * sizeof(size_t), // "nodejmij_dz",
+    3 * sizeof(size_t), // "nmnoz_dz",
+    3 * sizeof(size_t), // "ndziel_dz",
+    3 * sizeof(size_t), // "nreszta_dz",
+    3 * sizeof(size_t), // "dodaj_dz",
+    3 * sizeof(size_t), // "odejmij_dz",
+    3 * sizeof(size_t), // "mnoz_dz",
+    3 * sizeof(size_t), // "dziel_dz",
+    3 * sizeof(size_t), // "reszta_dz",
+    3 * sizeof(size_t), // "nadaj_dz",
+    2 * sizeof(size_t), // "nie_dz",
+    3 * sizeof(size_t), // "wieksze_dz",
+    3 * sizeof(size_t), // "mniejsze_dz",
 
-    "jesli_klc",
-    "poki_klc",
+    2 * sizeof(size_t), // "jesli_klc",
+    2 * sizeof(size_t), // "poki_klc",
 
-    "skok_wjk"
-};*/
+    1 * sizeof(size_t), // "skok_wjk"
+};
 
 __declspec(dllexport) size_t liczbaPrzenoszonychPolecen = sizeof(nazwyPrzenoszonychPolecen)/sizeof(nazwyPrzenoszonychPolecen[0]); // ich liczba

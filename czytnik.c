@@ -734,9 +734,9 @@ size_t przygotowanieDlaCz()
     return utworzZmiennaWObszarze(wWObszaruPowszechnego, "$domyslny", sizeof(zaw), 0, 2, &zaw);
 }
 
+
 Czastka wczytujNastepne(char** wskaznik);
 size_t wczytujJakoNazwa(char** wskaznik);
-
 
 size_t wczytujJakoObszarGlowny(char** wskaznik)
 {
@@ -1071,6 +1071,7 @@ size_t wczytujJakoNazwa(char** wskaznik)
     //return utworzZmienna(sizeof(size_t), 0, 0, &(nazwyZmiennych[nazwa])); // utworzenie zmiennej odnosnik do nazwy (a nie nazwę)
     return znajdzLubUtworzZmiennaWObszarze(wWWykonywanegoObszaru, nazwyZmiennych[nazwa], sizeof(size_t), 0, 0, &nazwa); // utworzenie zmiennej odnosnik do nazwy (a nie nazwę)
 }
+
 
 char* wczytujKluczowe(char** wskaznik)
 {
