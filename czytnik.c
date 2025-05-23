@@ -39,6 +39,7 @@ size_t pojemnoscNazwZmiennych = 0;
 FILE* zrodlo;
 const char hasloCzp[] = { 0x50, 0x49, 0x45, 0x52, 0x57, 0x53, 0x5A, 0x59 }; // "PIERWSZY" zapisane szesnastkowo
 char* poczatek = NULL;
+char* obecny = NULL;
 char* koniec = NULL;
 
 FILE* pekCzytelnegoPocztu;
@@ -784,6 +785,8 @@ size_t wczytujJakoObszarGlowny(char** wskaznik)
     wskaznikLiczbyOzinow = &liczbaOzinowObszaru;
     wskaznikPojemnosciOzinow = &pojemnoscOzinowObszaru;*/
 
+    //size_t odnosnikZmiennejReszty = znajdzLubUtworzZmiennaWObszarze(wWObszaruGlownego, "reszta", 0, 1, 4, NULL);
+
     Czastka* czastkiObszaru = (Czastka*)malloc(sizeof(Czastka));
     size_t pojemnoscCzastekObszaru = 1;
     size_t rozmiarCzastekObszaru = 0;
@@ -814,6 +817,9 @@ size_t wczytujJakoObszarGlowny(char** wskaznik)
         else if(czastkiObszaru[i].rodzaj == 0) printf("Czastka %zu: %hhu - %c\n", i, czastkiObszaru[i].rodzaj, *((char*)czastkiObszaru[i].zawartosc));
         else printf("Czastka %zu: %hhu - %s\n", i, czastkiObszaru[i].rodzaj, (char*)czastkiObszaru[i].zawartosc);
     }
+
+    //ustawZawartoscZmiennej(pozyskajZmiennaZObszaru(*wWObszaruGlownego, odnosnikZmiennejReszty), (size_t)(koniec - polozenie), polozenie);
+    printf("Reszta:\n%s\n", polozenie);
 
     getchar();
 
@@ -880,6 +886,7 @@ size_t wczytujJakoObszarGlowny(char** wskaznik)
     //printf("Przywrocono stary poczet\n");
 
     zetnijRozgalezienie(drzewo);
+
     zejdz();
     //printf("Scieto drzewo\n");
 
@@ -891,7 +898,7 @@ size_t wczytujJakoObszarGlowny(char** wskaznik)
 
     //printf("Uwolniono oziny\n");
     //printf("Uwolniono czastki\n");
-
+    *wskaznik = polozenie;
     return odnosnikWWObszaruGlownego;
 }
 
@@ -1288,16 +1295,6 @@ void wezwij()
 void tlumacz()
 {
     printf("Rozpoczeto tlumaczenie\n");
-    fseek(zrodlo, 0, SEEK_END);
-    size_t rozmiar = ftell(zrodlo);
-    rewind(zrodlo);
-
-    poczatek = (char*)malloc(rozmiar + 1);
-    if(!poczatek) niezbywalnyBlad("Brak pamieci");
-    fread(poczatek, 1, rozmiar, zrodlo);
-    poczatek[rozmiar] = '\0';
-    char* obecny = poczatek;
-    koniec = poczatek + rozmiar;
 
     dlugoscTrzymakaNazwTymczasowych = snprintf(NULL, 0, "!t%zu", SIZE_MAX) + 1;
     trzymakNazwTymaczasowych = malloc(dlugoscTrzymakaNazwTymczasowych);
@@ -1306,6 +1303,8 @@ void tlumacz()
     size_t odonosnikObszaruGlownego = wczytujJakoObszarGlowny(&obecny);
     printf("Zwrocono obszar glowny o odnosniku %zu\n", odonosnikObszaruGlownego);
 
+    wWWykonywanegoObszaruGlownego = pozyskajZmiennaZObszaru(*wWObszaruPowszechnego, odonosnikObszaruGlownego);
+
     free(trzymakNazwTymaczasowych);
     trzymakNazwTymaczasowych = NULL;
 }
@@ -1313,9 +1312,9 @@ void tlumacz()
 void czytaj()
 {
     //przelaczNaObszar(zmienne[23], NULL);
-    Zmienna** znalezionyObszar = znajdzZmiennaWObszarze(wWObszaruPowszechnego, znajdzLubDodajNazweZmiennej("$glowny", 0));
-    printf("Zaraz przelaczymy na obszar %p\n", znalezionyObszar);
-    przelaczNaObszar(znalezionyObszar);
+    //Zmienna** znalezionyObszar = znajdzZmiennaWObszarze(wWObszaruPowszechnego, znajdzLubDodajNazweZmiennej("$glowny", 0));
+    printf("Zaraz przelaczymy na obszar %p\n", wWWykonywanegoObszaruGlownego);
+    przelaczNaObszar(wWWykonywanegoObszaruGlownego);
     printf("Przelaczano na obszar glowny\n");
     //niezbywalnyBlad("Koniec testu");
 }
@@ -1347,18 +1346,37 @@ void zakoncz()
     exit(EXIT_SUCCESS);
 }
 
+void pozyskaj_reszte()
+{
+    Zmienna** z = oziny[*((size_t*)(poczet + odnosnikPolecenia))].wWZmiennej;
+    ustawZawartoscZmiennej(z, (size_t)(koniec - obecny), obecny);
+    (*z)->rod = 4;
+    odnosnikPolecenia += sizeof(size_t);
+    printf("Pozyskano reszte\n");
+}
+
+void ustaw_reszte()
+{
+    Zmienna** z = oziny[*((size_t*)(poczet + odnosnikPolecenia))].wWZmiennej;
+    size_t r = (*z)->rozmiar;
+    if(koniec - poczatek < (*z)->rozmiar)
+    {
+        poczatek = realloc(poczatek, r + 1);
+        if(!poczatek) niezbywalnyBlad("Brak pamieci");
+    }
+    memcpy(poczatek, zawartosc(*z), r);
+    obecny = poczatek;
+    koniec = poczatek + r;
+    *koniec = '\0';
+    odnosnikPolecenia += sizeof(size_t);
+    printf("Ustawiono reszte\n");
+}
 
 int main(int argc, char *argv[])
 {
-    if(argc < 2)
-    {
-        niezbywalnyBlad("Nie podano zrodla");
-    }
+    if(argc < 2) niezbywalnyBlad("Nie podano zrodla");
     zrodlo = fopen(argv[1], "rb");
-    if(zrodlo == NULL)
-    {
-        niezbywalnyBlad("Nie mozna otworzyc zrodla");
-    }
+    if(zrodlo == NULL) niezbywalnyBlad("Nie mozna otworzyc zrodla");
 
     size_t dlugosc = strlen(argv[1]);
 
@@ -1390,6 +1408,8 @@ int main(int argc, char *argv[])
     polecenia[2] = tlumacz;
     polecenia[3] = czytaj;
     polecenia[4] = zakoncz;
+    polecenia[5] = pozyskaj_reszte;
+    polecenia[6] = ustaw_reszte;
 
     nazwyPolecen = (char**)malloc(sizeof(char*) * pojemnoscPolecen);
     nazwyPolecen[0] = NULL;
@@ -1397,6 +1417,8 @@ int main(int argc, char *argv[])
     nazwyPolecen[2] = "tlumacz_dom";
     nazwyPolecen[3] = "czytaj_dom";
     nazwyPolecen[4] = "zakoncz_dom";
+    nazwyPolecen[5] = "pozyskaj_reszte_dom";
+    nazwyPolecen[6] = "ustaw_reszte_dom";
 
     dlugosciWywodowPolecen = (size_t*)malloc(sizeof(size_t) * pojemnoscPolecen);
     dlugosciWywodowPolecen[0] = 0;
@@ -1404,8 +1426,10 @@ int main(int argc, char *argv[])
     dlugosciWywodowPolecen[2] = 0;
     dlugosciWywodowPolecen[3] = 0;
     dlugosciWywodowPolecen[4] = 0;
+    dlugosciWywodowPolecen[5] = sizeof(size_t);
+    dlugosciWywodowPolecen[6] = sizeof(size_t);
 
-    liczbaPolecen = 5;
+    liczbaPolecen = 7;
 
     printf("Wzywanie podstawy.dll\n");
     wzywanie("podstawy.dll");
@@ -1413,6 +1437,17 @@ int main(int argc, char *argv[])
     //przelaczNaObszar(zmienne[obszarPrzygotowawczy], NULL);
     przelaczNaObszar(wWObszaruPowszechnego);
     przelaczNaPoczet(pozyskajZmiennaZObszaru(*wWObszaruPowszechnego, poczetPrzygotowawczy));
+
+    fseek(zrodlo, 0, SEEK_END);
+    size_t rozmiar = ftell(zrodlo);
+    rewind(zrodlo);
+
+    poczatek = (char*)malloc(rozmiar + 1);
+    if(!poczatek) niezbywalnyBlad("Brak pamieci");
+    fread(poczatek, 1, rozmiar, zrodlo);
+    poczatek[rozmiar] = '\0';
+    obecny = poczatek;
+    koniec = poczatek + rozmiar;
 
     printf("Rozpoczeto wykonywanie\n");
     while(TRUE)

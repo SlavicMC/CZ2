@@ -1,13 +1,20 @@
-2000000000000000000000000000000000000000000 + 3000000000000000000000000000000000000000000;
 x = 5;
 y = 7;
-$dodaj_dz x $1 $2
-$odejmij_dz tymczasowa x y
+reszta = "jeszcze mnie nie ustawili";
+$wypisz_prs reszta
 jesli(12 == x + y || x >= y)
 {
     x += 1;
     y -= 1;
 }
+
+$ustaw_reszte_dom "warunkowa = tak;"
+$pozyskaj_reszte_dom reszta
+$wypisz_prs reszta
+$tlumacz_dom
+$czytaj_dom
+
+###
 
 tekst = "cos tu pisze";
 warunkowa = tak;

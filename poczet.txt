@@ -1,22 +1,2 @@
-dodaj_dz 17 1 2
-nadaj_dz 17 3 4
-nadaj_dz 17 5 6
-dodaj_dz 3 1 2
-odejmij_dz 7 3 5
-dodaj_dz 19 3 5
-rowne_dz 18 8 19
-wieksze_badz_rowne_dz 20 3 5
-lub_dz 17 18 20
-jesli_klc 17
-ndodaj_dz 17 3 9
-nodejmij_dz 17 5 9
-nadaj_dz 17 10 11
-nadaj_dz 17 12 13
-nadaj_dz 17 14 15
-wieksze_dz 18 5 16
-nie_dz 20 14
-i_dz 17 18 20
-poki_klc 17
-nodejmij_dz 17 5 9
-skok_wjk 367
+nadaj_dz 3 1 2
 zakoncz_dom

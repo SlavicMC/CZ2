@@ -534,7 +534,9 @@ void __declspec(dllexport) nadaj_dz()
     Zmienna** z2 = oziny[wartosci[2]].wWZmiennej;
 
     ustawZawartoscZmiennej(z1, (*z2)->rozmiar, zawartosc(*z2));
+    (*z1)->rod = (*z2)->rod;
     ustawZawartoscZmiennej(wynik, (*z2)->rozmiar, zawartosc(*z2));
+    (*wynik)->rod = (*z2)->rod;
     
     *wskaznikOdnosnikaPolecenia += 3 * sizeof(size_t);
 
@@ -628,6 +630,32 @@ void __declspec(dllexport) skok_wjk()
     //*wskaznikOdnosnikaPolecenia += 1 * sizeof(size_t);
 }
 
+void __declspec(dllexport) wypisz_prs()
+{
+    printf("Wywolano wypisanie\n");
+    
+    Zmienna** z = (*wskaznikOzinow)[((size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia))[0]].wWZmiennej;
+    size_t rod = (*z)->rod;
+    if(rod == 0) printf("Pustka\n");
+    else if(rod == 1) printf("Obszar(...)\n");
+    else if(rod == 2) printf("Poczet{...}\n");
+    else if(rod == 3)
+    {
+        mpz_t liczba;
+        mpz_init(liczba);
+        mpz_import(liczba, (*z)->rozmiar, 1, 1, 0, 0, zawartosc(*z));
+        gmp_printf("%Zd\n", liczba);
+        mpz_clear(liczba);
+    }
+    else if(rod == 4) printf("%.*s\n", (*z)->rozmiar, zawartosc(*z));
+    else if(rod == 5)
+    {
+        if(*(zawartosc(*z))) printf("tak\n");
+        else printf("nie\n");
+    }
+    *wskaznikOdnosnikaPolecenia += 1 * sizeof(size_t);
+}
+
 // kluczowa zawartość dll
 
 void __declspec(dllexport) dostosuj(SciagnijObszaryKon sok, SciagnijNazwyZmiennychKon snzk, SciagnijPoczetKon spk, SciagnijZarzadzanieZmiennymiKon szzk) // dostosowywuje dll
@@ -665,7 +693,9 @@ __declspec(dllexport) char* nazwyPrzenoszonychPolecen[] = {
     "jesli_klc",
     "poki_klc",
 
-    "skok_wjk"
+    "skok_wjk",
+
+    "wypisz_prs"
 };
 
 // ilość bajtów jaką wymaga każde polecenie (nie licząc własnego odnośnika)
@@ -694,7 +724,9 @@ __declspec(dllexport) size_t dlugosciWywodowPrzenoszonychPolecen[] = {
     2 * sizeof(size_t), // "jesli_klc",
     2 * sizeof(size_t), // "poki_klc",
 
-    1 * sizeof(size_t), // "skok_wjk"
+    1 * sizeof(size_t), // "skok_wjk",
+
+    1 * sizeof(size_t) // "wypisz_prs"
 };
 
 __declspec(dllexport) size_t liczbaPrzenoszonychPolecen = sizeof(nazwyPrzenoszonychPolecen)/sizeof(nazwyPrzenoszonychPolecen[0]); // ich liczba
