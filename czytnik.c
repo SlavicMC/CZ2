@@ -418,7 +418,7 @@ size_t walkujGalazPodwojna(GalazPodwojna* galaz, size_t liczbaZmiennychTymczasow
             printf("Rozpoczeto wpisywanie slowa kluczowego: %s (liczba zmiennych tymczasowych: %zu)", nazwyPolecenSlowKluczowych[i], liczbaZmiennychTymczasowych);
             getchar();
             if(!galaz->lewa || !galaz->prawa) niezbywalnyBlad("Blad wczytywania slowa kluczowego (brak galezi)");
-            size_t poczatekPocztuSlowaKluczowego = (*wWWykonywanegoPocztu)->rozmiar; // zapisujemy gdzie zaczynamy bo wałkowanie lewej gałęzi może i najpewniej go przesunie
+            size_t poczatekPocztuSlowaKluczowego = (*wWWykonywanegoPocztu)->rozmiar - sizeof(Zmienna**); // zapisujemy gdzie zaczynamy bo wałkowanie lewej gałęzi może i najpewniej go przesunie
 
             size_t z1 = walkujGalazPodwojna((GalazPodwojna*)(galaz->lewa), liczbaZmiennychTymczasowych);
 
@@ -494,7 +494,8 @@ size_t walkujGalazPodwojna(GalazPodwojna* galaz, size_t liczbaZmiennychTymczasow
                 dlugoscPocztu += sizeof(size_t);*/
             }
             // teraz wiedząc gdzie jest koniec wpisujemy wartość skoku
-            memcpy(zawartosc(*wWWykonywanegoPocztu) + miejsceSkoku, &((*wWWykonywanegoPocztu)->rozmiar), sizeof(size_t));
+            size_t wartoscSkoku = (*wWWykonywanegoPocztu)->rozmiar - sizeof(size_t);
+            memcpy(zawartosc(*wWWykonywanegoPocztu) + miejsceSkoku, &wartoscSkoku, sizeof(wartoscSkoku));
             printf("\nWpisano wyjatkowe %s (%s)", nazwyPolecen[odnosnikPolecenia], nazwyPolecenSlowKluczowych[i]);
             getchar();
             return 0;
