@@ -41,6 +41,7 @@ Stworzenie prostego polskiego języka programowania z bytecodem
 | Ród           | Opis                     |
 |---------------|--------------------------|
 | `obs`         | obszar (funkcja/obiekt)  |
+| `pct`         | poczet (kod wykonywalny) |
 | `lic`         | liczba całkowita         |
 | `pis`         | ciąg znaków              |
 | `tln`         | boolean                  |
