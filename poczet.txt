@@ -1,2 +1,3 @@
-nadaj_dz 3 1 2
-zakoncz_dom
+wywolaj_dz 16 4 2
+nadaj_dz 3 1 4
+wypisz_prs 1

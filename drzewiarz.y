@@ -13,6 +13,8 @@ size_t odnosnikCzastki;
 size_t liczbaCzastek;
 Rozgalezienie* drzewo = NULL;
 
+#define WYKONAJ 101
+
 %}
 
 %union {
@@ -29,9 +31,9 @@ Rozgalezienie* drzewo = NULL;
 %token NADAJ NDODAJ NODEJMIJ NMNOZ NDZIEL NRESZTA
 %token NIE ROWNE ROZNE WIEKSZE MNIEJSZE WIEKSZE_BADZ_ROWNE MNIEJSZE_BADZ_ROWNE
 %token I LUB
-%token SREDNIK LNAWIAS PNAWIAS LSPIECIE PSPIECIE
-%type <rozgalezienie> wyrazenia
-%type <galazPodwojna> wyrazenie dzialanie
+%token SREDNIK PRZECINEK LNAWIAS PNAWIAS LSPIECIE PSPIECIE
+%type <rozgalezienie> wyrazenia dzialania
+%type <galazPodwojna> wyrazenie dzialanie wywolanie
 
 %right NADAJ NDODAJ NODEJMIJ NMNOZ NDZIEL NRESZTA
 %left I LUB
@@ -46,6 +48,7 @@ Rozgalezienie* drzewo = NULL;
 
 calosc:
     wyrazenia   { drzewo = $1; }
+    //| dzialania   { drzewo = $1; }
     ;
 
 wyrazenia:
@@ -60,6 +63,11 @@ wyrazenie:
     | JESLI LNAWIAS dzialanie PNAWIAS wyrazenie                     { $$ = utworzWyrazenieKluczowe(JESLI, $3, pojedynczeRozgalezienie($5)); }
     | POKI LNAWIAS dzialanie PNAWIAS LSPIECIE wyrazenia PSPIECIE    { $$ = utworzWyrazenieKluczowe(POKI, $3, $6); }
     | POKI LNAWIAS dzialanie PNAWIAS wyrazenie                      { $$ = utworzWyrazenieKluczowe(POKI, $3, pojedynczeRozgalezienie($5)); }
+    ;
+
+dzialania:
+      dzialanie                         { $$ = utworzRozgalezienie(); dodajGalaz($$, $1); }
+    | dzialania PRZECINEK dzialanie     { dodajGalaz($1, $3); $$ = $1; }
     ;
 
 dzialanie:
@@ -83,14 +91,20 @@ dzialanie:
     | dzialanie MNIEJSZE_BADZ_ROWNE dzialanie   { $$ = utworzDzialanie(MNIEJSZE_BADZ_ROWNE, $1, $3); }
     | dzialanie I dzialanie                     { $$ = utworzDzialanie(I, $1, $3); }
     | dzialanie LUB dzialanie                   { $$ = utworzDzialanie(LUB, $1, $3); }
+    | wywolanie                                 { $$ = $1; }
     | LNAWIAS dzialanie PNAWIAS                 { $$ = $2; }
     | ZMIENNA                                   { $$ = utworzZmiennaJakoGalaz($1); }
     ;
+
+wywolanie:
+      ZMIENNA LNAWIAS dzialania PNAWIAS     { $$ = utworzDzialanie(WYKONAJ, utworzZmiennaJakoGalaz($1), $3); }
+    | ZMIENNA LNAWIAS PNAWIAS               { $$ = utworzDzialanie(WYKONAJ, utworzZmiennaJakoGalaz($1), utworzRozgalezienie()); }
 
 %%
 
 int zmienniana = ZMIENNA;
 int poleceniana = POLECENIE;
+int wykonaniana = WYKONAJ;
 int kluczowe[] = { 0, JESLI, POKI};
 size_t liczbaSlowKluczowych = sizeof(kluczowe)/sizeof(kluczowe[0]);
 // char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+=", "-=", "*=", "/=", "%=", "+", "-", "*", "/", "%", "=", "!", ">", "<"};
@@ -155,7 +169,7 @@ Rozgalezienie* pojedynczeRozgalezienie(GalazPodwojna* galaz)
 }
 
 
-GalazPodwojna* utworzDzialanie(int dz, GalazPodwojna* lewy, GalazPodwojna* prawy)
+GalazPodwojna* utworzDzialanie(int dz, GalazPodwojna* lewy, void* prawy)
 {
     GalazPodwojna* galaz = malloc(sizeof(GalazPodwojna));
     if(!galaz)
@@ -198,6 +212,7 @@ int yylex(void)
         switch (*((char*)czastka.zawartosc)) // nieznany to zawsze jeden bajt
         {
             case ';': return SREDNIK;
+            case ',': return PRZECINEK;
             case '(': return LNAWIAS;
             case ')': return PNAWIAS;
             case '{': return LSPIECIE;
@@ -316,9 +331,9 @@ void dodajGalaz(Rozgalezienie* rozgalezienie, GalazPodwojna* galaz)
 
 void zetnijGalaz(GalazPodwojna* galaz)
 {
-    if (galaz == NULL) return;
+    if(galaz == NULL) return;
     zetnijGalaz(galaz->lewa);
-    if(galaz->rodzaj == JESLI || galaz->rodzaj == POKI) zetnijRozgalezienie(galaz->prawa);
+    if(galaz->rodzaj == JESLI || galaz->rodzaj == POKI || galaz->rodzaj == WYKONAJ) zetnijRozgalezienie(galaz->prawa);
     else zetnijGalaz(galaz->prawa);
     free(galaz);
 }
@@ -337,6 +352,7 @@ void zetnijRozgalezienie(Rozgalezienie* rozgalezienie)
 const char* nazwaRodzaju(int rodzaj)
 {
     if(rodzaj == ZMIENNA) return "ZMIENNA";
+    if(rodzaj == WYKONAJ) return "WYKONANIE";
     if(rodzaj == POLECENIE) return "POLECENIE";
     for(size_t i = 0; i < sizeof(dzialaniowe)/sizeof(dzialaniowe[0]); i++)
     {
@@ -360,6 +376,10 @@ void wypiszGalaz(GalazPodwojna* galaz, int wciecie)
     if(galaz->rodzaj == ZMIENNA)
     {
         printf(", Zmienna #%zu\n", galaz->wartosc);
+    }
+    else if(galaz->rodzaj == WYKONAJ)
+    {
+        printf(", Zmienna #%zu\n", ((GalazPodwojna*)galaz->lewa)->wartosc);
     }
     else if(galaz->rodzaj == POLECENIE)
     {

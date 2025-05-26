@@ -79,10 +79,11 @@ extern int yydebug;
     I = 280,                       /* I  */
     LUB = 281,                     /* LUB  */
     SREDNIK = 282,                 /* SREDNIK  */
-    LNAWIAS = 283,                 /* LNAWIAS  */
-    PNAWIAS = 284,                 /* PNAWIAS  */
-    LSPIECIE = 285,                /* LSPIECIE  */
-    PSPIECIE = 286                 /* PSPIECIE  */
+    PRZECINEK = 283,               /* PRZECINEK  */
+    LNAWIAS = 284,                 /* LNAWIAS  */
+    PNAWIAS = 285,                 /* PNAWIAS  */
+    LSPIECIE = 286,                /* LSPIECIE  */
+    PSPIECIE = 287                 /* PSPIECIE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -91,14 +92,14 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 18 "drzewiarz.y"
+#line 20 "drzewiarz.y"
 
     size_t zmienna;
     char* polecenie;
     GalazPodwojna* galazPodwojna;
     Rozgalezienie* rozgalezienie;
 
-#line 102 "drzewiarz.tab.h"
+#line 103 "drzewiarz.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

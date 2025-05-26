@@ -59,9 +59,11 @@ typedef struct {
 typedef void (*SciagnijObszaryKon)(Zmienna****, Zmienna****, Zmienna****, Ozin***);
 typedef void (*SciagnijNazwyZmiennychKon)(char****, size_t**, size_t**);
 typedef void (*SciagnijPoczetKon)(Zmienna****, char***, size_t**);
-typedef void (*SciagnijZarzadzanieZmiennymiKon)(void (**dodaj)(Zmienna**, size_t, void*), void (**ustaw)(Zmienna**, size_t, void*));
+typedef void (*SciagnijZarzadzanieZmiennymiKon)(void (**dodaj)(Zmienna**, size_t, void*), void (**ustaw)(Zmienna**, size_t, void*), Zmienna** (**odbij)(Zmienna**));
+typedef void (*SciagnijZarzadzanieStosemWyjscKon)(void (**wWPrzelaczNaPoczet)(Zmienna**), void (**wWPrzelaczNaObszar)(Zmienna**), void (**wWZejdz)());
+typedef void (*SciagnijPoleceniaKon)(Polecenie***, char****, size_t***, size_t**, size_t**);
 
-typedef void (*DostosujKon)(SciagnijObszaryKon, SciagnijNazwyZmiennychKon, SciagnijPoczetKon, SciagnijZarzadzanieZmiennymiKon);
+typedef void (*DostosujKon)(SciagnijObszaryKon, SciagnijNazwyZmiennychKon, SciagnijPoczetKon, SciagnijPoleceniaKon, SciagnijZarzadzanieZmiennymiKon, SciagnijZarzadzanieStosemWyjscKon);
 
 
 static inline char* zawartosc(Zmienna* zmienna)

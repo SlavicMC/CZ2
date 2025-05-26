@@ -1,0 +1,7 @@
+w = obszar(w1,w2, w3)
+{
+    w1 = 5 + 7;
+    $wypisz_prs w1
+    $wypisz_prs w2
+}();
+$wypisz_prs w

@@ -21,6 +21,7 @@ extern size_t liczbaDzialan;
 
 extern int zmienniana;
 extern int poleceniana;
+extern int wykonaniana;
 extern int kluczowe[];
 extern int dzialaniowe[];
 
@@ -36,7 +37,7 @@ const char* nazwaRodzaju(int rodzaj);
 void wypiszGalaz(GalazPodwojna* galaz, int wciecie);
 void wypiszDrzewo(Rozgalezienie* rozgalezienie, int wciecie);
 
-GalazPodwojna* utworzDzialanie(int dz, GalazPodwojna* lewy, GalazPodwojna* prawy);
+GalazPodwojna* utworzDzialanie(int dz, GalazPodwojna* lewy, void* prawy);
 GalazPodwojna* utworzWyrazenieKluczowe(int dz, GalazPodwojna* lewy, Rozgalezienie* prawy);
 GalazPodwojna* utworzZmiennaJakoGalaz(size_t z);
 GalazPodwojna* utworzPolecenieJakoGalaz(char* p);

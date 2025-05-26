@@ -76,3 +76,22 @@ kopia();
 wypisz(kopia.z1);
 
 jeszczeinnyobszar(6);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+$wykonaj $40 wynik funkcja w1 w2 w3
