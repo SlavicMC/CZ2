@@ -612,6 +612,29 @@ void __declspec(dllexport) wieksze_dz()
 void __declspec(dllexport) mniejsze_dz()
 {
     printf("Wywolano mniejsze\n");
+    Ozin* oziny = *wskaznikOzinow;
+    size_t* wartosci = (size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia);
+    
+    Zmienna** wynik = oziny[wartosci[0]].wWZmiennej;
+    Zmienna** z1 = oziny[wartosci[1]].wWZmiennej;
+    Zmienna** z2 = oziny[wartosci[2]].wWZmiennej;
+
+    mpz_t z1_mpz, z2_mpz;
+    mpz_init(z1_mpz);
+    mpz_init(z2_mpz);
+
+    mpz_import(z1_mpz, (*z1)->rozmiar, 1, 1, 0, 0, zawartosc(*z1));
+    mpz_import(z2_mpz, (*z2)->rozmiar, 1, 1, 0, 0, zawartosc(*z2));
+
+    unsigned char wynik_bool = (mpz_cmp(z1_mpz, z2_mpz) < 0) ? 1 : 0;
+
+    ustawZawartoscZmiennej(wynik, sizeof(wynik_bool), &wynik_bool);
+    (*wynik)->rod = 5;
+    printf("Ustawiono zawartosc: %s\n", (*(zawartosc(*wynik))) ? "tak" : "nie");
+
+    mpz_clear(z1_mpz);
+    mpz_clear(z2_mpz);
+
     *wskaznikOdnosnikaPolecenia += 3 * sizeof(size_t);
 }
 
@@ -623,6 +646,7 @@ void __declspec(dllexport) wywolaj_dz()
     if(liczbaWartosci < 2) return;
     //Zmienna** wynik = oziny[wartosci[1]].wWZmiennej;
     Zmienna** wywolywana = oziny[wartosci[2]].wWZmiennej;
+    if((*wywolywana)->rod != 1) return;
     Ozin* ozinyWywolywanej = (Ozin*)zawartosc(*wywolywana);
     liczbaWartosci -= 2;
     if(liczbaWartosci > (*ozinyWywolywanej).odnosnikNazwy) return;

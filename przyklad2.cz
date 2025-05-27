@@ -1,7 +1,12 @@
 w = obszar(w1,w2, w3)
 {
-    w1 = 5 + 7;
-    $wypisz_prs w1
-    $wypisz_prs w2
-}();
-$wypisz_prs w
+    $wypisz_prs "wywolanie"
+    jesli(w2 < 3)
+    {
+        w1(w1, w2 + 1);
+    }
+};
+w(w, 0);
+$wypisz_prs "koniec rekurencji"
+
+
