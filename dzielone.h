@@ -25,7 +25,7 @@ extern int wykonaniana;
 extern int kluczowe[];
 extern int dzialaniowe[];
 
-Rozgalezienie* robDrzewo(Czastka* cz, size_t l);
+Rozgalezienie* robDrzewo(Czastka* cz, size_t l, char* p, char* k);
 void zetnijGalaz(GalazPodwojna* galaz);
 
 Rozgalezienie* utworzRozgalezienie();

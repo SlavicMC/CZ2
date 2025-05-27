@@ -15,6 +15,10 @@ Rozgalezienie* drzewo = NULL;
 
 #define WYKONAJ 101
 
+char* polozenie;
+char* pPola;
+char* kPola;
+
 %}
 
 %union {
@@ -47,17 +51,19 @@ Rozgalezienie* drzewo = NULL;
 %%
 
 calosc:
-    wyrazenia   { drzewo = $1; }
-    //| dzialania   { drzewo = $1; }
+    wyrazenia           { drzewo = $1; }
+    | error SREDNIK     { yyerror("Nieoczekiwany srednik"); yyerrok; }
+    //| dzialania       { drzewo = $1; }
     ;
 
 wyrazenia:
-      /* nic */             { $$ = utworzRozgalezienie(); }
-    | wyrazenia wyrazenie   { dodajGalaz($1, $2); $$ = $1; }
+      /* nic */                     { $$ = utworzRozgalezienie(); }
+    | wyrazenia wyrazenie           { dodajGalaz($1, $2); $$ = $1; }
     ;
 
 wyrazenie:
       dzialanie SREDNIK                                             { $$ = $1; }
+    | dzialanie error                                               { yyerror("Brak srednika"); yyerrok; }
     | POLECENIE                                                     { $$ = utworzPolecenieJakoGalaz($1); }
     | JESLI LNAWIAS dzialanie PNAWIAS LSPIECIE wyrazenia PSPIECIE   { $$ = utworzWyrazenieKluczowe(JESLI, $3, $6); }
     | JESLI LNAWIAS dzialanie PNAWIAS wyrazenie                     { $$ = utworzWyrazenieKluczowe(JESLI, $3, pojedynczeRozgalezienie($5)); }
@@ -204,6 +210,7 @@ int yylex(void)
     //printf("yylex rusza!\n");
     if(odnosnikCzastki >= liczbaCzastek) return 0;
     Czastka czastka = czastki[odnosnikCzastki++];
+    polozenie = czastka.polozenie;
     if(czastka.rodzaj == 0) // nieznany (nawiasy, klamry i średniki)
     {
         yylval.zmienna = 0;
@@ -285,12 +292,74 @@ int yylex(void)
 
 void yyerror(const char *s)
 {
-    fprintf(stderr, "Blad robienia drzewa: %s\n", s);
+    fprintf(stderr, "\033[1;31m[BLAD SKLADNIOWY] %s\033[0m\n", s);
+    FILE* pekBledu = fopen("blad.txt", "wb+");
+    if(pPola == NULL || kPola == NULL)
+    {
+        fprintf(stderr, "\033[1;31mNieznane zrodlo\033[0m\n");
+    }
+    else if(pekBledu == NULL)
+    {
+        perror("fopen (blad.txt)");
+        fprintf(stderr, "\033[1;31mNie mozna otworzyc peku bledu (w)\033[0m\n");
+    }
+    else
+    {
+        size_t pionowa = 1;
+        size_t pozioma = 1;
+        char* i;
+        for(i = pPola; i < polozenie; i++)
+        {
+            pozioma++;
+            if(*i == '\n')
+            {
+                pozioma = 0;
+                pionowa++;
+            }
+            fputc(*i, pekBledu);
+        }
+        if(i < kPola && *i != '\n')
+        {
+            while(i < kPola && *i != '\n') fputc(*(i++), pekBledu);
+        }
+        else fputc('\n', pekBledu);
+        i++;
+        if(pozioma)
+        {
+            for(size_t j = 1; j < pozioma; j++) fputc(' ', pekBledu);
+            fprintf(pekBledu, "/\\\n");
+            if(pozioma > 1)
+            {
+                for(size_t j = 2; j < pozioma; j++) fputc(' ', pekBledu);
+                fprintf(pekBledu, "/||\\\n");
+            }
+            else
+            {
+                for(size_t j = 1; j < pozioma; j++) fputc(' ', pekBledu);
+                fprintf(pekBledu, "||\\\n");
+            }
+            for(size_t j = 1; j < pozioma; j++) fputc(' ', pekBledu);
+            fprintf(pekBledu, "||\n");
+            for(size_t j = 1; j < pozioma; j++) fputc(' ', pekBledu);
+            fprintf(pekBledu, "┕┙\n");
+        }
+        else
+        {
+            fprintf(pekBledu, "\\\n");
+            fprintf(pekBledu, "|\\\n");
+            fprintf(pekBledu, "|\n");
+            fprintf(pekBledu, "┙\n");
+        }
+        if(kPola > i) fwrite(i, 1, kPola - i, pekBledu);
+        fclose(pekBledu);
+        fprintf(stderr, "\033[1;31mPolozenie bledu: [ %zu : %zu ]\033[0m\n", pionowa, pozioma);
+    }
+
     getchar();
     exit(EXIT_FAILURE);
 }
 
-Rozgalezienie* robDrzewo(Czastka* cz, size_t l)
+Rozgalezienie* robDrzewo(Czastka* cz, size_t l, char* p, char* k)
 {
     czastki = cz;
     odnosnikCzastki = 0;
@@ -301,6 +370,8 @@ Rozgalezienie* robDrzewo(Czastka* cz, size_t l)
         getchar();
         return NULL;
     }
+    pPola = p;
+    kPola = k;
     drzewo = NULL;
     printf("Rozpoczynamy?");
     getchar();

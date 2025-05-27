@@ -25,7 +25,7 @@ Zmienna** wWWykonywanegoObszaru = NULL;
 Ozin* oziny = NULL;
 
 Zmienna** wWWykonywanegoPocztu = NULL;
-char* poczet = NULL;
+unsigned char* poczet = NULL;
 size_t odnosnikPolecenia = 0;
 
 ZmiennaILiczba* stosWyjsc = NULL;
@@ -39,6 +39,7 @@ size_t pojemnoscNazwZmiennych = 0;
 const char hasloCzp[] = { 0x50, 0x49, 0x45, 0x52, 0x57, 0x53, 0x5A, 0x59 }; // "PIERWSZY" zapisane szesnastkowo
 FILE* zrodlo;
 char* poczatek = NULL;
+char* poczatekPola = NULL;
 char* obecny = NULL;
 char* koniec = NULL;
 
@@ -92,7 +93,7 @@ uintptr_t nastepnaPotegaDwojki(uintptr_t x)
 
 void niezbywalnyBlad(const char* wiadomosc)
 {
-    fprintf(stderr, "[NIEZBYWALNY BLAD] %s\n", wiadomosc);
+    fprintf(stderr, "\033[1;31m[NIEZBYWALNY BLAD] %s\033[0m\n", wiadomosc);
     /*for(size_t i = 1; i < liczbaZmiennych; i++)
     {
         if(zmienne[i]) free(zmienne[i]);
@@ -509,7 +510,7 @@ void sciagnijNazwyZmiennych(char**** wWNazwZmiennych, size_t** wWLiczbyNazwZmien
     if(wWPojemnosciNazwZmiennych) *wWPojemnosciNazwZmiennych = &pojemnoscNazwZmiennych;
 }
 
-void sciagnijPoczet(Zmienna**** wWWWWykonywanegoPocztu, char*** wWPocztu, size_t** wWOdnosnikaPolecenia)
+void sciagnijPoczet(Zmienna**** wWWWWykonywanegoPocztu, unsigned char*** wWPocztu, size_t** wWOdnosnikaPolecenia)
 {
     if(wWWWWykonywanegoPocztu) *wWWWWykonywanegoPocztu = &wWWykonywanegoPocztu;
     if(wWPocztu) *wWPocztu = &poczet;
@@ -834,7 +835,7 @@ void pocztuj(char** wskaznik, boolean czyGlowny)
     getchar();
 
     printf("Rozpoczeto robienie drzewa\n");
-    Rozgalezienie* drzewo = robDrzewo(czastkiObszaru, rozmiarCzastekObszaru);
+    Rozgalezienie* drzewo = robDrzewo(czastkiObszaru, rozmiarCzastekObszaru, poczatekPola, koniec);
     printf("Drzewo:\n");
     wypiszDrzewo(drzewo, 0);
     getchar();
@@ -1284,36 +1285,37 @@ size_t wczytujZmienne(char** wskaznik)
 Czastka wczytujNastepne(char** wskaznik)
 {
     uintptr_t wynik;
+    char* polozenie = *wskaznik;
     wynik = (uintptr_t)wczytujPolecenie(wskaznik);
     if(wynik)
     {
-        Czastka c = {4, wynik};
+        Czastka c = {4, wynik, polozenie};
         printf("Wczytano polecenie: %s\n", nazwyPolecen[*((char*)wynik)]);
         return c;
     }
     wynik = (uintptr_t)wczytujKluczowe(wskaznik);
     if(wynik)
     {
-        Czastka c = {1, wynik};
+        Czastka c = {1, wynik, polozenie};
         printf("Wczytano kluczowe: %s\n", (char*)wynik);
         return c;
     }
     wynik = (uintptr_t)wczytujDzialania(wskaznik);
     if(wynik)
     {
-        Czastka c = {3, wynik};
+        Czastka c = {3, wynik, polozenie};
         printf("Wczytano dzialanie: %s\n", (char*)wynik);
         return c;
     }
     wynik = wczytujZmienne(wskaznik);
     if(wynik)
     {
-        Czastka c = {2, wynik};
+        Czastka c = {2, wynik, polozenie};
         printf("Wczytano zmienna: %zu (nazwa: %s)\n", (size_t)wynik, nazwyZmiennych[pozyskajOdnosnikNazwyZObszaru(*wWWykonywanegoObszaru, (size_t)wynik)]);
         return c;
     }
     printf("Wczytano nieznany: %c\n", **wskaznik);
-    Czastka c = {0, (uintptr_t)((*wskaznik)++)};
+    Czastka c = {0, (uintptr_t)((*wskaznik)++), polozenie};
     return c;
 }
 
@@ -1424,6 +1426,8 @@ void tlumacz()
     dlugoscTrzymakaNazwTymczasowych = snprintf(NULL, 0, "!t%zu", SIZE_MAX) + 1;
     trzymakNazwTymaczasowych = malloc(dlugoscTrzymakaNazwTymczasowych);
     if(!trzymakNazwTymaczasowych) niezbywalnyBlad("Brak pamieci");
+
+    poczatekPola = obecny;
 
     size_t odonosnikObszaruGlownego = wczytujJakoObszarGlowny(&obecny);
     printf("Zwrocono obszar glowny o odnosniku %zu\n", odonosnikObszaruGlownego);

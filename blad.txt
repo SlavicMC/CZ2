@@ -1,0 +1,11 @@
+
+
+w = "cos";
+w = "cos innego";
+jesli() { nwm; }     /\
+    /||\
+     ||
+     ┕┙
+y = 2 + 2;
+
+w = "cos jeszcze innego";
