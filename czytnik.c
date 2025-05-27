@@ -1367,6 +1367,42 @@ void wzywanie(char* nazwa)
     printf("Koniec wczytywania\n");
 }
 
+void wcielanie(char* nazwa)
+{
+    FILE* pek = fopen(nazwa, "rb");
+    if(!pek) niezbywalnyBlad("Nie udalo sie otworzyc peku o podanej nazwie");
+    fseek(pek, 0, SEEK_END);
+    long rozmiar = ftell(pek);
+    if (rozmiar < 0)
+    {
+        fclose(pek);
+        niezbywalnyBlad("Nie udalo sie odczytac rozmiaru peku");
+    }
+    rewind(pek);
+    size_t calosc = koniec - poczatek;
+    size_t doObecnego = obecny - poczatek;
+    size_t doKonca = koniec - obecny;
+    size_t wymagany = rozmiar + 1 + doKonca;
+    if(calosc < wymagany)
+    {
+        poczatek = realloc(poczatek, wymagany + 1);
+        if(!poczatek) niezbywalnyBlad("Brak pamieci");
+        memmove(poczatek + rozmiar + 1, poczatek + doObecnego, doKonca);
+        if(fread(poczatek, 1, rozmiar, pek) != (size_t)rozmiar) niezbywalnyBlad("Blad odczytu peku");
+        koniec = poczatek + wymagany;
+        poczatek[rozmiar] = '\n';
+        *koniec = '\0';
+        obecny = poczatek;
+    }
+    else
+    {
+        *(--obecny) = '\n';
+        obecny -= rozmiar;
+        if(fread(obecny, 1, rozmiar, pek) != (size_t)rozmiar) niezbywalnyBlad("Blad odczytu peku");
+    }
+    fclose(pek);
+}
+
 
 void wezwij()
 {
@@ -1378,6 +1414,7 @@ void wezwij()
     p[r] = '\0';
     wzywanie(p);
     free(p);
+    odnosnikPolecenia += sizeof(size_t);
 }
 
 void tlumacz()
@@ -1460,6 +1497,19 @@ void ustaw_reszte()
     printf("Ustawiono reszte\n");
 }
 
+void wciel()
+{
+    printf("Rozpoczeto wcielanie\n");
+    Zmienna** z = oziny[*((size_t*)(poczet + odnosnikPolecenia))].wWZmiennej;
+    size_t r = (*z)->rozmiar;
+    char* p = malloc(r + 1);
+    memcpy(p, zawartosc(*z), r);
+    p[r] = '\0';
+    wcielanie(p);
+    free(p);
+    odnosnikPolecenia += sizeof(size_t);
+}
+
 int main(int argc, char *argv[])
 {
     if(argc < 2) niezbywalnyBlad("Nie podano zrodla");
@@ -1498,7 +1548,7 @@ int main(int argc, char *argv[])
     polecenia[4] = zakoncz;
     polecenia[5] = pozyskaj_reszte;
     polecenia[6] = ustaw_reszte;
-    //polecenia[7] = zejdz;
+    polecenia[7] = wciel;
 
     nazwyPolecen = (char**)malloc(sizeof(char*) * pojemnoscPolecen);
     nazwyPolecen[0] = NULL;
@@ -1508,7 +1558,7 @@ int main(int argc, char *argv[])
     nazwyPolecen[4] = "zakoncz_dom";
     nazwyPolecen[5] = "pozyskaj_reszte_dom";
     nazwyPolecen[6] = "ustaw_reszte_dom";
-    //nazwyPolecen[7] = "zejdz_dom";
+    nazwyPolecen[7] = "wciel_dom";
 
     dlugosciWywodowPolecen = (size_t*)malloc(sizeof(size_t) * pojemnoscPolecen);
     dlugosciWywodowPolecen[0] = 0;
@@ -1518,9 +1568,9 @@ int main(int argc, char *argv[])
     dlugosciWywodowPolecen[4] = 0;
     dlugosciWywodowPolecen[5] = sizeof(size_t);
     dlugosciWywodowPolecen[6] = sizeof(size_t);
-    //dlugosciWywodowPolecen[7] = 0;
+    dlugosciWywodowPolecen[7] = sizeof(size_t);
 
-    liczbaPolecen = 7;
+    liczbaPolecen = 8;
 
     printf("Wzywanie podstawy.dll\n");
     wzywanie("podstawy.dll");

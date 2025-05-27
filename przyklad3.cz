@@ -1,0 +1,9 @@
+$wciel_dom "wcielany.cz"
+
+$tlumacz_dom
+$czytaj_dom
+###
+
+$wypisz_prs "kontrolka"
+
+jakasTamFunkcja("parametr jakiejs tam funkcji");

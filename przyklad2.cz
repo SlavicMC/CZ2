@@ -5,6 +5,7 @@ w = obszar(w1,w2, w3)
     {
         w1(w1, w2 + 1);
     }
+    $wypisz_prs w2
 };
 w(w, 0);
 $wypisz_prs "koniec rekurencji"
