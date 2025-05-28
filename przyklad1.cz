@@ -17,6 +17,7 @@ $czytaj_dom
 
 ###
 
+y = 7;
 tekst = "cos tu pisze";
 warunkowa = tak;
 innawarunkowa = nie;
@@ -24,4 +25,5 @@ innawarunkowa = nie;
 poki (y > 2 && !innawarunkowa)
 {
     y -= 1;
+    $wypisz_prs "wykonanie petli"
 }
