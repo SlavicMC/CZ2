@@ -808,7 +808,10 @@ void __declspec(dllexport) wypisz_prs()
         mpz_t liczba;
         mpz_init(liczba);
         mpz_import(liczba, (*z)->rozmiar, 1, 1, 0, 0, zawartosc(*z));
-        gmp_printf("%Zd\n", liczba);
+        char* str = mpz_get_str(NULL, 10, liczba);
+        printf("%s\n", str);
+        zwolnijPamiecZMpz(str, strlen(str) + 1);
+        //gmp_printf("%Zd\n", liczba);
         mpz_clear(liczba);
     }
     else if(rod == 4) printf("%.*s\n", (*z)->rozmiar, zawartosc(*z));
