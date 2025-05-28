@@ -558,10 +558,11 @@ size_t walkujGalazPodwojna(GalazPodwojna* galaz, size_t liczbaZmiennychTymczasow
         size_t nazwa = znajdzLubDodajNazweZmiennej(trzymakNazwTymaczasowych, 0);
         size_t wynik = znajdzLubUtworzZmiennaWObszarze(wWWykonywanegoObszaru, nazwyZmiennych[nazwa], sizeof(size_t), sizeof(size_t), 0, &nazwa);
         size_t z1 = walkujGalazPodwojna((GalazPodwojna*)(galaz->lewa), liczbaZmiennychTymczasowych + 1);
-        size_t gGWartosci = pozyskajOdnosnikNazwyZObszaru(*pozyskajZmiennaZObszaru(*wWWykonywanegoObszaru, z1), 0);
+        //size_t gGWartosci = pozyskajOdnosnikNazwyZObszaru(*pozyskajZmiennaZObszaru(*wWWykonywanegoObszaru, z1), 0);
         Rozgalezienie* rozgalezienie = (Rozgalezienie*)(galaz->prawa);
         size_t r = rozgalezienie->rozmiar;
-        if(gGWartosci < r) niezbywalnyBlad("Przekroczono dozwolona liczbe wartosci przekazywanych wywolania");
+        //if(gGWartosci < r) niezbywalnyBlad("Przekroczono dozwolona liczbe wartosci przekazywanych wywolania");
+        //printf("GG wartosc: %zu, Rozmiar: %zu\n", gGWartosci, r);
         size_t* wartosci = (size_t*)malloc(sizeof(size_t) * r);
         for(size_t i = 0; i < r; i++)
         {
@@ -1022,6 +1023,7 @@ size_t wczytujJakoObszar(char** wskaznik) // nie pojawi się w pierwszym teście
     }
 
     ((Ozin*)(zawartosc(*wWObszaru)))->odnosnikNazwy = liczba;
+    printf("LICZBA ZMIENNYCH: %zu\n", ((Ozin*)zawartosc(*wWObszaru))->odnosnikNazwy);
 
     /*while(polozenie < koniec && isspace((unsigned char)(*polozenie))) polozenie++;
     if(*polozenie != ')') niezbywalnyBlad("Brak zakonczenia nawiasu obszaru");
