@@ -1,7 +1,6 @@
 $wypisz_prs "pierwszy"
 
 dodatek = "$tlumacz_dom $czytaj_dom ### $wypisz_prs tak";
-reszta;
 
 $pozyskaj_reszte_dom reszta
 
