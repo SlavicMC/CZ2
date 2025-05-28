@@ -1,12 +1,20 @@
 $wypisz_prs "pierwszy"
 
-dodatek = "$tlumacz_dom $czytaj_dom ### $wypisz_prs tak";
+dodatek = "
+$tlumacz_dom
+$czytaj_dom
+###
+$wypisz_prs tak
+";
 
-$pozyskaj_reszte_dom reszta
-
-suma = reszta + dodatek;
-
-$ustaw_reszte_dom suma
+i = 0;
+poki(i < 3)
+{
+    $pozyskaj_reszte_dom reszta
+    suma = reszta + dodatek;
+    $ustaw_reszte_dom suma
+    i += 1;
+}
 
 $tlumacz_dom
 $czytaj_dom
