@@ -1,0 +1,17 @@
+$wypisz_prs "pierwszy"
+
+dodatek = "$tlumacz_dom $czytaj_dom ### $wypisz_prs tak";
+reszta;
+
+$pozyskaj_reszte_dom reszta
+
+suma = reszta + dodatek;
+
+$ustaw_reszte_dom suma
+
+$tlumacz_dom
+$czytaj_dom
+
+###
+
+$wypisz_prs "drugi"
