@@ -1,4 +1,0 @@
-wywolaj_dz 16 6 2
-nadaj_dz 5 1 6
-wypisz_prs 3
-wywolaj_dz 24 5 1 4

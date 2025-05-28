@@ -8,7 +8,8 @@ jesli(12 == x + y || x >= y)
     y -= 1;
 }
 
-$ustaw_reszte_dom "warunkowa = tak;"
+$ustaw_reszte_dom "warunkowa = tak;
+$wypisz_prs warunkowa"
 $pozyskaj_reszte_dom reszta
 $wypisz_prs reszta
 $tlumacz_dom

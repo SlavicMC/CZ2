@@ -13,7 +13,7 @@ char*** wskaznikNazwZmiennych;
 
 Ozin** wskaznikOzinow = NULL;
 
-char** wskaznikPocztu = NULL;
+unsigned char** wskaznikPocztu = NULL;
 size_t* wskaznikOdnosnikaPolecenia = NULL;
 
 char*** wskaznikNazwPolecen = NULL;
@@ -30,7 +30,7 @@ void (*zwolnijPamiecZMpz)(void *, size_t);
 
 void __declspec(dllexport) rowne_dz()
 {
-    printf("Wywolano rowne\n");
+    //printf("Wywolano rowne\n");
     Ozin* oziny = *wskaznikOzinow;
     size_t* wartosci = (size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia);
     
@@ -49,7 +49,7 @@ void __declspec(dllexport) rowne_dz()
 
     ustawZawartoscZmiennej(wynik, sizeof(wynik_bool), &wynik_bool);
     (*wynik)->rod = 5; 
-    printf("Ustawiono zawartosc: %s\n", (*(zawartosc(*wynik))) ? "tak" : "nie");
+    //printf("Ustawiono zawartosc: %s\n", (*(zawartosc(*wynik))) ? "tak" : "nie");
 
     mpz_clear(z1_mpz);
     mpz_clear(z2_mpz);
@@ -59,7 +59,7 @@ void __declspec(dllexport) rowne_dz()
 
 void __declspec(dllexport) rozne_dz()
 {
-    printf("Wywolano rozne\n");
+    //printf("Wywolano rozne\n");
     Ozin* oziny = *wskaznikOzinow;
     size_t* wartosci = (size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia);
     
@@ -78,7 +78,7 @@ void __declspec(dllexport) rozne_dz()
 
     ustawZawartoscZmiennej(wynik, sizeof(wynik_bool), &wynik_bool);
     (*wynik)->rod = 5; 
-    printf("Ustawiono zawartosc: %s\n", (*(zawartosc(*wynik))) ? "tak" : "nie");
+    //printf("Ustawiono zawartosc: %s\n", (*(zawartosc(*wynik))) ? "tak" : "nie");
 
     mpz_clear(z1_mpz);
     mpz_clear(z2_mpz);
@@ -88,7 +88,7 @@ void __declspec(dllexport) rozne_dz()
 
 void __declspec(dllexport) wieksze_badz_rowne_dz()
 {
-    printf("Wywolano wieksze badz rowne\n");
+    //printf("Wywolano wieksze badz rowne\n");
     Ozin* oziny = *wskaznikOzinow;
     size_t* wartosci = (size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia);
     
@@ -107,7 +107,7 @@ void __declspec(dllexport) wieksze_badz_rowne_dz()
 
     ustawZawartoscZmiennej(wynik, sizeof(wynik_bool), &wynik_bool);
     (*wynik)->rod = 5;
-    printf("Ustawiono zawartosc: %s\n", (*(zawartosc(*wynik))) ? "tak" : "nie");
+    //printf("Ustawiono zawartosc: %s\n", (*(zawartosc(*wynik))) ? "tak" : "nie");
 
     mpz_clear(z1_mpz);
     mpz_clear(z2_mpz);
@@ -117,13 +117,36 @@ void __declspec(dllexport) wieksze_badz_rowne_dz()
 
 void __declspec(dllexport) mniejsze_badz_rowne_dz()
 {
-    printf("Wywolano mniejsze badz rowne\n");
+    //printf("Wywolano wieksze badz rowne\n");
+    Ozin* oziny = *wskaznikOzinow;
+    size_t* wartosci = (size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia);
+    
+    Zmienna** wynik = oziny[wartosci[0]].wWZmiennej;
+    Zmienna** z1 = oziny[wartosci[1]].wWZmiennej;
+    Zmienna** z2 = oziny[wartosci[2]].wWZmiennej;
+
+    mpz_t z1_mpz, z2_mpz;
+    mpz_init(z1_mpz);
+    mpz_init(z2_mpz);
+
+    mpz_import(z1_mpz, (*z1)->rozmiar, 1, 1, 0, 0, zawartosc(*z1));
+    mpz_import(z2_mpz, (*z2)->rozmiar, 1, 1, 0, 0, zawartosc(*z2));
+
+    unsigned char wynik_bool = (mpz_cmp(z1_mpz, z2_mpz) <= 0) ? 1 : 0;
+
+    ustawZawartoscZmiennej(wynik, sizeof(wynik_bool), &wynik_bool);
+    (*wynik)->rod = 5;
+    //printf("Ustawiono zawartosc: %s\n", (*(zawartosc(*wynik))) ? "tak" : "nie");
+
+    mpz_clear(z1_mpz);
+    mpz_clear(z2_mpz);
+
     *wskaznikOdnosnikaPolecenia += 3 * sizeof(size_t);
 }
 
 void __declspec(dllexport) lub_dz()
 {
-    printf("Wywolano lub\n");
+    //printf("Wywolano lub\n");
     Ozin* oziny = *wskaznikOzinow;
     size_t* wartosci = (size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia);
     
@@ -135,14 +158,14 @@ void __declspec(dllexport) lub_dz()
 
     ustawZawartoscZmiennej(wynik, sizeof(wynik_bool), &wynik_bool);
     (*wynik)->rod = 5; 
-    printf("Ustawiono zawartosc: %s\n", (*(zawartosc(*wynik))) ? "tak" : "nie");
+    //printf("Ustawiono zawartosc: %s\n", (*(zawartosc(*wynik))) ? "tak" : "nie");
 
     *wskaznikOdnosnikaPolecenia += 3 * sizeof(size_t);
 }
 
 void __declspec(dllexport) i_dz()
 {
-    printf("Wywolano i\n");
+    //printf("Wywolano i\n");
     Ozin* oziny = *wskaznikOzinow;
     size_t* wartosci = (size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia);
     
@@ -154,14 +177,14 @@ void __declspec(dllexport) i_dz()
 
     ustawZawartoscZmiennej(wynik, sizeof(wynik_bool), &wynik_bool);
     (*wynik)->rod = 5; 
-    printf("Ustawiono zawartosc: %s\n", (*(zawartosc(*wynik))) ? "tak" : "nie");
+    //printf("Ustawiono zawartosc: %s\n", (*(zawartosc(*wynik))) ? "tak" : "nie");
 
     *wskaznikOdnosnikaPolecenia += 3 * sizeof(size_t);
 }
 
 void __declspec(dllexport) ndodaj_dz()
 {
-    printf("Wywolano ndodaj\n");
+    //printf("Wywolano ndodaj\n");
 
     Ozin* oziny = *wskaznikOzinow;
     size_t* wartosci = (size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia);
@@ -177,11 +200,11 @@ void __declspec(dllexport) ndodaj_dz()
     mpz_import(z1_mpz, (*z1)->rozmiar, 1, 1, 0, 0, zawartosc(*z1));
     mpz_import(z2_mpz, (*z2)->rozmiar, 1, 1, 0, 0, zawartosc(*z2));
 
-    char* str1 = mpz_get_str(NULL, 10, z1_mpz);
+    /*char* str1 = mpz_get_str(NULL, 10, z1_mpz);
     char* str2 = mpz_get_str(NULL, 10, z2_mpz);
     printf("Z1: %s\nZ2: %s\n", str1, str2);
     zwolnijPamiecZMpz(str1, strlen(str1) + 1);
-    zwolnijPamiecZMpz(str2, strlen(str2) + 1);
+    zwolnijPamiecZMpz(str2, strlen(str2) + 1);*/
 
     mpz_add(z1_mpz, z1_mpz, z2_mpz);
 
@@ -190,7 +213,7 @@ void __declspec(dllexport) ndodaj_dz()
     ustawZawartoscZmiennej(z1, rozmiar, surowa);
     ustawZawartoscZmiennej(wynik, rozmiar, surowa);
     (*wynik)->rod = (*z1)->rod;
-    printf("Ustawiono zawartosc\n");
+    //printf("Ustawiono zawartosc\n");
 
     zwolnijPamiecZMpz(surowa, rozmiar);
     mpz_clear(z1_mpz);
@@ -198,18 +221,18 @@ void __declspec(dllexport) ndodaj_dz()
 
     *wskaznikOdnosnikaPolecenia += 3 * sizeof(size_t);
 
-    mpz_t log;
+    /*mpz_t log;
     mpz_init(log);
     mpz_import(log, (*wynik)->rozmiar, 1, 1, 0, 0, zawartosc(*wynik));
     char* str = mpz_get_str(NULL, 10, log);
     printf("Pomyslnie zapisano wynik: %s\n", str);
     zwolnijPamiecZMpz(str, strlen(str) + 1);
-    mpz_clear(log);
+    mpz_clear(log);*/
 }
 
 void __declspec(dllexport) nodejmij_dz()
 {
-    printf("Wywolano nodejmij\n");
+    //printf("Wywolano nodejmij\n");
 
     Ozin* oziny = *wskaznikOzinow;
     size_t* wartosci = (size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia);
@@ -225,11 +248,11 @@ void __declspec(dllexport) nodejmij_dz()
     mpz_import(z1_mpz, (*z1)->rozmiar, 1, 1, 0, 0, zawartosc(*z1));
     mpz_import(z2_mpz, (*z2)->rozmiar, 1, 1, 0, 0, zawartosc(*z2));
 
-    char* str1 = mpz_get_str(NULL, 10, z1_mpz);
+    /*char* str1 = mpz_get_str(NULL, 10, z1_mpz);
     char* str2 = mpz_get_str(NULL, 10, z2_mpz);
     printf("Z1: %s\nZ2: %s\n", str1, str2);
     zwolnijPamiecZMpz(str1, strlen(str1) + 1);
-    zwolnijPamiecZMpz(str2, strlen(str2) + 1);
+    zwolnijPamiecZMpz(str2, strlen(str2) + 1);*/
 
     mpz_sub(z1_mpz, z1_mpz, z2_mpz);
 
@@ -238,7 +261,7 @@ void __declspec(dllexport) nodejmij_dz()
     ustawZawartoscZmiennej(z1, rozmiar, surowa);
     ustawZawartoscZmiennej(wynik, rozmiar, surowa);
     (*wynik)->rod = (*z1)->rod;
-    printf("Ustawiono zawartosc\n");
+    //printf("Ustawiono zawartosc\n");
 
     zwolnijPamiecZMpz(surowa, rozmiar);
     mpz_clear(z1_mpz);
@@ -246,18 +269,18 @@ void __declspec(dllexport) nodejmij_dz()
 
     *wskaznikOdnosnikaPolecenia += 3 * sizeof(size_t);
 
-    mpz_t log;
+    /*mpz_t log;
     mpz_init(log);
     mpz_import(log, (*wynik)->rozmiar, 1, 1, 0, 0, zawartosc(*wynik));
     char* str = mpz_get_str(NULL, 10, log);
     printf("Pomyslnie zapisano wynik: %s\n", str);
     zwolnijPamiecZMpz(str, strlen(str) + 1);
-    mpz_clear(log);
+    mpz_clear(log);*/
 }
 
 void __declspec(dllexport) nmnoz_dz()
 {
-    printf("Wywolano nmnoz\n");
+    //printf("Wywolano nmnoz\n");
 
     Ozin* oziny = *wskaznikOzinow;
     size_t* wartosci = (size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia);
@@ -273,11 +296,11 @@ void __declspec(dllexport) nmnoz_dz()
     mpz_import(z1_mpz, (*z1)->rozmiar, 1, 1, 0, 0, zawartosc(*z1));
     mpz_import(z2_mpz, (*z2)->rozmiar, 1, 1, 0, 0, zawartosc(*z2));
 
-    char* str1 = mpz_get_str(NULL, 10, z1_mpz);
+    /*char* str1 = mpz_get_str(NULL, 10, z1_mpz);
     char* str2 = mpz_get_str(NULL, 10, z2_mpz);
     printf("Z1: %s\nZ2: %s\n", str1, str2);
     zwolnijPamiecZMpz(str1, strlen(str1) + 1);
-    zwolnijPamiecZMpz(str2, strlen(str2) + 1);
+    zwolnijPamiecZMpz(str2, strlen(str2) + 1);*/
 
     mpz_mul(z1_mpz, z1_mpz, z2_mpz);
 
@@ -286,7 +309,7 @@ void __declspec(dllexport) nmnoz_dz()
     ustawZawartoscZmiennej(z1, rozmiar, surowa);
     ustawZawartoscZmiennej(wynik, rozmiar, surowa);
     (*wynik)->rod = (*z1)->rod;
-    printf("Ustawiono zawartosc\n");
+    //printf("Ustawiono zawartosc\n");
 
     zwolnijPamiecZMpz(surowa, rozmiar);
     mpz_clear(z1_mpz);
@@ -294,31 +317,31 @@ void __declspec(dllexport) nmnoz_dz()
 
     *wskaznikOdnosnikaPolecenia += 3 * sizeof(size_t);
 
-    mpz_t log;
+    /*mpz_t log;
     mpz_init(log);
     mpz_import(log, (*wynik)->rozmiar, 1, 1, 0, 0, zawartosc(*wynik));
     char* str = mpz_get_str(NULL, 10, log);
     printf("Pomyslnie zapisano wynik: %s\n", str);
     zwolnijPamiecZMpz(str, strlen(str) + 1);
-    mpz_clear(log);
+    mpz_clear(log);*/
 }
 
 void __declspec(dllexport) ndziel_dz()
 {
-    printf("Wywolano ndziel\n");
+    //printf("Wywolano ndziel\n");
     *wskaznikOdnosnikaPolecenia += 3 * sizeof(size_t);
 }
 
 void __declspec(dllexport) nreszta_dz()
 {
-    printf("Wywolano nreszta\n");
+    //printf("Wywolano nreszta\n");
     *wskaznikOdnosnikaPolecenia += 3 * sizeof(size_t);
 }
 
 void __declspec(dllexport) dodaj_dz()
 {
     // Log (tymczasowy)
-    printf("Wywolano dodaj\n");
+    //printf("Wywolano dodaj\n");
     // Pozyskujemy wskaźnik do wartości z pocztu i rzutujemy je na size_t
     Ozin* oziny = *wskaznikOzinow;
     size_t* wartosci = (size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia);
@@ -340,20 +363,20 @@ void __declspec(dllexport) dodaj_dz()
         mpz_import(z2_mpz, (*z2)->rozmiar, 1, 1, 0, 0, zawartosc(*z2));
         // Wykonujemy działanie
         mpz_add(wynik_mpz, z1_mpz, z2_mpz);
-        // Log (tymczasowy)
+        /*// Log (tymczasowy)
         char* str1 = mpz_get_str(NULL, 10, z1_mpz);
         char* str2 = mpz_get_str(NULL, 10, z2_mpz);
         char* str3 = mpz_get_str(NULL, 10, wynik_mpz);
         printf("Z1: %s\nZ2: %s\nWynik: %s\n", str1, str2, str3);
         zwolnijPamiecZMpz(str1, strlen(str1) + 1);
         zwolnijPamiecZMpz(str2, strlen(str2) + 1);
-        zwolnijPamiecZMpz(str3, strlen(str3) + 1);
+        zwolnijPamiecZMpz(str3, strlen(str3) + 1);*/
         // Ustawiamy zawartość wyniku
         size_t rozmiar;
         void* surowa = mpz_export(NULL, &rozmiar, 1, 1, 0, 0, wynik_mpz);
         ustawZawartoscZmiennej(wynik, rozmiar, surowa);
         (*wynik)->rod = (*z1)->rod;
-        printf("Ustawiono zawartosc\n");
+        //printf("Ustawiono zawartosc\n");
         // Zwalnianie pamięci
         zwolnijPamiecZMpz(surowa, rozmiar);
         mpz_clear(wynik_mpz);
@@ -545,7 +568,7 @@ void __declspec(dllexport) reszta_dz()
 
 void __declspec(dllexport) nadaj_dz()
 {
-    printf("Wywolano nadaj\n");
+    //printf("Wywolano nadaj\n");
 
     Ozin* oziny = *wskaznikOzinow;
     size_t* wartosci = (size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia);
@@ -564,7 +587,7 @@ void __declspec(dllexport) nadaj_dz()
 
 void __declspec(dllexport) nie_dz()
 {
-    printf("Wywolano nie\n");
+    //printf("Wywolano nie\n");
     Ozin* oziny = *wskaznikOzinow;
     size_t* wartosci = (size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia);
     
@@ -575,14 +598,14 @@ void __declspec(dllexport) nie_dz()
 
     ustawZawartoscZmiennej(wynik, sizeof(wynik_bool), &wynik_bool);
     (*wynik)->rod = 5;
-    printf("Ustawiono zawartosc: %s\n", (*(zawartosc(*wynik))) ? "tak" : "nie");
+    //printf("Ustawiono zawartosc: %s\n", (*(zawartosc(*wynik))) ? "tak" : "nie");
 
     *wskaznikOdnosnikaPolecenia += 2 * sizeof(size_t);
 }
 
 void __declspec(dllexport) wieksze_dz()
 {
-    printf("Wywolano wieksze\n");
+    //printf("Wywolano wieksze\n");
     Ozin* oziny = *wskaznikOzinow;
     size_t* wartosci = (size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia);
     
@@ -601,7 +624,7 @@ void __declspec(dllexport) wieksze_dz()
 
     ustawZawartoscZmiennej(wynik, sizeof(wynik_bool), &wynik_bool);
     (*wynik)->rod = 5;
-    printf("Ustawiono zawartosc: %s\n", (*(zawartosc(*wynik))) ? "tak" : "nie");
+    //printf("Ustawiono zawartosc: %s\n", (*(zawartosc(*wynik))) ? "tak" : "nie");
 
     mpz_clear(z1_mpz);
     mpz_clear(z2_mpz);
@@ -611,7 +634,7 @@ void __declspec(dllexport) wieksze_dz()
 
 void __declspec(dllexport) mniejsze_dz()
 {
-    printf("Wywolano mniejsze\n");
+    //printf("Wywolano mniejsze\n");
     Ozin* oziny = *wskaznikOzinow;
     size_t* wartosci = (size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia);
     
@@ -630,7 +653,7 @@ void __declspec(dllexport) mniejsze_dz()
 
     ustawZawartoscZmiennej(wynik, sizeof(wynik_bool), &wynik_bool);
     (*wynik)->rod = 5;
-    printf("Ustawiono zawartosc: %s\n", (*(zawartosc(*wynik))) ? "tak" : "nie");
+    //printf("Ustawiono zawartosc: %s\n", (*(zawartosc(*wynik))) ? "tak" : "nie");
 
     mpz_clear(z1_mpz);
     mpz_clear(z2_mpz);
@@ -659,7 +682,7 @@ void __declspec(dllexport) wywolaj_dz()
     }
     *wskaznikOdnosnikaPolecenia += wartosci[0] + sizeof(size_t);
     przelaczNaObszar(odbicie);
-    printf("Wywolano!\n");
+    //printf("Wywolano!\n");
 }
 
 void __declspec(dllexport) opusc_wjk()
@@ -669,35 +692,35 @@ void __declspec(dllexport) opusc_wjk()
 
 void __declspec(dllexport) jesli_klc()
 {
-    printf("Wywolano jesli\n");
+    //printf("Wywolano jesli\n");
     size_t* wartosci = (size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia);
     Zmienna** z = (*wskaznikOzinow)[wartosci[0]].wWZmiennej;
-    printf("Wartosc skoku: %zu\n", wartosci[1]);
+    //printf("Wartosc skoku: %zu\n", wartosci[1]);
     if(!(*(zawartosc(*z)))) *wskaznikOdnosnikaPolecenia = wartosci[1];
     else *wskaznikOdnosnikaPolecenia += 2 * sizeof(size_t);
 }
 
 void __declspec(dllexport) poki_klc()
 {
-    printf("Wywolano poki\n");
+    //printf("Wywolano poki\n");
     size_t* wartosci = (size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia);
     Zmienna** z = (*wskaznikOzinow)[wartosci[0]].wWZmiennej;
-    printf("Wartosc skoku: %zu\n", wartosci[1]);
+    //printf("Wartosc skoku: %zu\n", wartosci[1]);
     if(!(*(zawartosc(*z)))) *wskaznikOdnosnikaPolecenia = wartosci[1];
     else *wskaznikOdnosnikaPolecenia += 2 * sizeof(size_t);
 }
 
 void __declspec(dllexport) skok_wjk()
 {
-    printf("Wywolano skok\n");
-    printf("Skok na miejsce %zu\n", *((size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia)));
+    //printf("Wywolano skok\n");
+    //printf("Skok na miejsce %zu\n", *((size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia)));
     *wskaznikOdnosnikaPolecenia = *((size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia));
     //*wskaznikOdnosnikaPolecenia += 1 * sizeof(size_t);
 }
 
 void __declspec(dllexport) wypisz_prs()
 {
-    printf("Wywolano wypisanie\n");
+    //printf("Wywolano wypisanie\n");
     
     Zmienna** z = (*wskaznikOzinow)[((size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia))[0]].wWZmiennej;
     size_t rod = (*z)->rod;

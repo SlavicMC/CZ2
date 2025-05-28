@@ -300,8 +300,8 @@ void yyerror(const char *s)
     }
     else if(pekBledu == NULL)
     {
-        perror("fopen (blad.txt)");
-        fprintf(stderr, "\033[1;31mNie mozna otworzyc peku bledu (w)\033[0m\n");
+        //perror("fopen (blad.txt)");
+        fprintf(stderr, "\033[1;31mNie mozna otworzyc peku bledu (wb+)\033[0m\n");
     }
     else
     {
@@ -366,20 +366,20 @@ Rozgalezienie* robDrzewo(Czastka* cz, size_t l, char* p, char* k)
     liczbaCzastek = l;
     if(!czastki || !liczbaCzastek)
     {
-        printf("Podano puste dane!\n");
-        getchar();
+        //printf("Podano puste dane!\n");
+        //getchar();
         return NULL;
     }
     pPola = p;
     kPola = k;
     drzewo = NULL;
-    printf("Rozpoczynamy?");
-    getchar();
+    //printf("Rozpoczynamy?");
+    //getchar();
     int result = yyparse();
     if (result != 0)
     {
-        fprintf(stderr, "Błąd podczas parsowania (kod: %d)\n", result);
-        getchar();
+        //fprintf(stderr, "Błąd podczas parsowania (kod: %d)\n", result);
+        //getchar();
         return NULL;
     }
     return drzewo;
