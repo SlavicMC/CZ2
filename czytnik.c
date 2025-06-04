@@ -51,8 +51,8 @@ void (*zwolnijPamiecZMpz)(void *, size_t);
 
 char* slowaKluczowe[] = {"###", "jesli", "poki"};
 char* nazwyPolecenSlowKluczowych[] = {"###", "jesli_klc", "poki_klc"};
-char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+=", "-=", "*=", "/=", "%=", "+", "-", "*", "/", "%", "=", "!", ">", "<"}; // działania idą w kolejności malejącej długości (najpierw sprawdzamy najdłuższe)
-char* nazwyPolecenDzialan[] = {"rowne_dz", "rozne_dz", "wieksze_badz_rowne_dz", "mniejsze_badz_rowne_dz", "lub_dz", "i_dz", "ndodaj_dz", "nodejmij_dz", "nmnoz_dz", "ndziel_dz", "nreszta_dz", "dodaj_dz", "odejmij_dz", "mnoz_dz", "dziel_dz", "reszta_dz", "nadaj_dz", "nie_dz", "wieksze_dz", "mniejsze_dz"};
+char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+=", "-=", "*=", "/=", "%=", "+", "-", "*", "/", "%", "=", "!", ">", "<", "."}; // działania idą w kolejności malejącej długości (najpierw sprawdzamy najdłuższe)
+char* nazwyPolecenDzialan[] = {"rowne_dz", "rozne_dz", "wieksze_badz_rowne_dz", "mniejsze_badz_rowne_dz", "lub_dz", "i_dz", "ndodaj_dz", "nodejmij_dz", "nmnoz_dz", "ndziel_dz", "nreszta_dz", "dodaj_dz", "odejmij_dz", "mnoz_dz", "dziel_dz", "reszta_dz", "nadaj_dz", "nie_dz", "wieksze_dz", "mniejsze_dz", "kropka_dz"};
 
 Polecenie* polecenia = NULL;
 char** nazwyPolecen = NULL;
@@ -156,8 +156,9 @@ void ustawZawartoscZmiennej(Zmienna** wWZmiennej, size_t rozmiar, void* zaw)
 
 Zmienna** utworzOdbicieZmiennej(Zmienna** odbijana)
 {
-    Zmienna* z = *odbijana; 
-    if(z->rod == 1)
+    Zmienna* z = *odbijana;
+    return utworzZmienna(z->rozmiar, z->pojemnosc, z->rod, zawartosc(z));
+    /*if(z->rod == 1)
     {
         size_t r = z->rozmiar / sizeof(Ozin);
         Zmienna** w = utworzZmienna(z->rozmiar, z->pojemnosc, z->rod, zawartosc(z));
@@ -165,14 +166,14 @@ Zmienna** utworzOdbicieZmiennej(Zmienna** odbijana)
         Ozin* ozinyOdbicia = (Ozin*)zawartosc(*w);
         for(size_t i = 1; i < r; i++)
         {
-            ozinyOdbicia[i].wWZmiennej = utworzOdbicieZmiennej(ozinyOdbijanej[i].wWZmiennej);
+            if(*(nazwyZmiennych[ozinyOdbijanej[i].odnosnikNazwy]) != '*') ozinyOdbicia[i].wWZmiennej = utworzOdbicieZmiennej(ozinyOdbijanej[i].wWZmiennej);
         }
         return w;
     }
     else
     {
         return utworzZmienna(z->rozmiar, z->pojemnosc, z->rod, zawartosc(z));
-    }
+    }*/
 }
 
 /*void odbijZmienna(Zmienna** miejsce, Zmienna** odbijana)
@@ -219,6 +220,7 @@ size_t dodajNazweZmiennej(char* nazwa, size_t dlugosc)
 // ! - zmienne wczytywane
 // = - zmienne tymczasowe (do obliczeń)
 // @ - poczet obszaru
+// * - wartość pozyskiwana
 size_t znajdzLubDodajNazweZmiennej(char* nazwa, size_t dlugosc)
 {
     if(nazwa == NULL) return 0;
@@ -329,6 +331,29 @@ size_t znajdzLubUtworzZmiennaWObszarze(Zmienna** wWObszaru, char* nazwa, size_t 
         if(przeszukiwaneOziny[i].wWZmiennej == NULL) continue;
         Zmienna* z = *(przeszukiwaneOziny[i].wWZmiennej);
         if(z->rod == rod && z->rozmiar == rozmiar && memcmp(zaw, zawartosc(z), rozmiar) == 0) return i;
+    }
+
+    if(wWWykonywanegoObszaruGlownego && wWWykonywanegoObszaruGlownego != wWObszaru)
+    {
+        size_t liczbaPrzeszukiwanychOzinowGlownych = (*wWWykonywanegoObszaruGlownego)->rozmiar / sizeof(Ozin);
+        przeszukiwaneOziny = (Ozin *)zawartosc(*wWWykonywanegoObszaruGlownego);
+        for(size_t i = 1; i < liczbaPrzeszukiwanychOzinowGlownych; i++)
+        {
+            Zmienna** wWZ = przeszukiwaneOziny[i].wWZmiennej;
+            if(wWZ == NULL) continue;
+            Zmienna *z = *(wWZ);
+            if(z->rod == rod && z->rozmiar == rozmiar && memcmp(zaw, zawartosc(z), rozmiar) == 0)
+            {
+                size_t r = strlen(nazwa) + 1;
+                char* poszerzona = malloc(r + 1);
+                *poszerzona = '*';
+                memcpy(poszerzona + 1, nazwa, r);
+                Ozin o = {wWZ, znajdzLubDodajNazweZmiennej(poszerzona, r)};
+                dodajZawartoscDoZmiennej(wWObszaru, sizeof(Ozin), &o);
+                //printf("Znaleziono w glownym %p\n", wWZ);
+                return liczbaPrzeszukiwanychOzinow;
+            }
+        }
     }
 
     if(rozmiar > pojemnosc) pojemnosc = nastepnaPotegaDwojki(rozmiar);
@@ -837,6 +862,8 @@ size_t wczytujJakoObszarGlowny(char** wskaznik)
     Zmienna** wWObszaruGlownego = pozyskajZmiennaZObszaru(*wWObszaruPowszechnego, odnosnikWWObszaruGlownego);
     dodajZawartoscDoZmiennej(wWPocztuGlownego, sizeof(wWObszaruGlownego), &wWObszaruGlownego);
     //wypiszStosWyjsc();
+    Zmienna** staryObszarGlowny = wWWykonywanegoObszaruGlownego;
+    wWWykonywanegoObszaruGlownego = wWObszaruGlownego;
     przelaczNaObszar(wWObszaruGlownego);
     //wypiszStosWyjsc();
 
@@ -847,6 +874,7 @@ size_t wczytujJakoObszarGlowny(char** wskaznik)
     //fprintf(pekCzytelnegoPocztu, "%s\n", nazwyPolecen[konczace]);
     //wypiszStosWyjsc();
     zejdz();
+    wWWykonywanegoObszaruGlownego = staryObszarGlowny;
     return odnosnikWWObszaruGlownego;
 }
 

@@ -45,6 +45,7 @@ char* kPola;
 %left DODAJ ODEJMIJ
 %left MNOZ DZIEL RESZTA
 %left NIE
+%left KROPKA
 
 %start calosc
 
@@ -97,6 +98,7 @@ dzialanie:
     | dzialanie MNIEJSZE_BADZ_ROWNE dzialanie   { $$ = utworzDzialanie(MNIEJSZE_BADZ_ROWNE, $1, $3); }
     | dzialanie I dzialanie                     { $$ = utworzDzialanie(I, $1, $3); }
     | dzialanie LUB dzialanie                   { $$ = utworzDzialanie(LUB, $1, $3); }
+    | dzialanie KROPKA dzialanie                { $$ = utworzDzialanie(KROPKA, $1, $3); }
     | wywolanie                                 { $$ = $1; }
     | LNAWIAS dzialanie PNAWIAS                 { $$ = $2; }
     | ZMIENNA                                   { $$ = utworzZmiennaJakoGalaz($1); }
@@ -113,8 +115,8 @@ int poleceniana = POLECENIE;
 int wykonaniana = WYKONAJ;
 int kluczowe[] = { 0, JESLI, POKI};
 size_t liczbaSlowKluczowych = sizeof(kluczowe)/sizeof(kluczowe[0]);
-// char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+=", "-=", "*=", "/=", "%=", "+", "-", "*", "/", "%", "=", "!", ">", "<"};
-int dzialaniowe[] = {ROWNE, ROZNE, WIEKSZE_BADZ_ROWNE, MNIEJSZE_BADZ_ROWNE, LUB, I, NDODAJ, NODEJMIJ, NMNOZ, NDZIEL, NRESZTA, DODAJ, ODEJMIJ, MNOZ, DZIEL, RESZTA, NADAJ, NIE, WIEKSZE, MNIEJSZE};
+// char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+=", "-=", "*=", "/=", "%=", "+", "-", "*", "/", "%", "=", "!", ">", "<", "."};
+int dzialaniowe[] = {ROWNE, ROZNE, WIEKSZE_BADZ_ROWNE, MNIEJSZE_BADZ_ROWNE, LUB, I, NDODAJ, NODEJMIJ, NMNOZ, NDZIEL, NRESZTA, DODAJ, ODEJMIJ, MNOZ, DZIEL, RESZTA, NADAJ, NIE, WIEKSZE, MNIEJSZE, KROPKA};
 size_t liczbaDzialan = sizeof(dzialaniowe)/sizeof(dzialaniowe[0]);
 
 GalazPodwojna* utworzZmiennaJakoGalaz(size_t z)

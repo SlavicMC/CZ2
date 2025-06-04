@@ -83,7 +83,8 @@ extern int yydebug;
     LNAWIAS = 284,                 /* LNAWIAS  */
     PNAWIAS = 285,                 /* PNAWIAS  */
     LSPIECIE = 286,                /* LSPIECIE  */
-    PSPIECIE = 287                 /* PSPIECIE  */
+    PSPIECIE = 287,                /* PSPIECIE  */
+    KROPKA = 288                   /* KROPKA  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -99,7 +100,7 @@ union YYSTYPE
     GalazPodwojna* galazPodwojna;
     Rozgalezienie* rozgalezienie;
 
-#line 103 "drzewiarz.tab.h"
+#line 104 "drzewiarz.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
