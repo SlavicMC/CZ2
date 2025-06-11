@@ -663,6 +663,74 @@ void __declspec(dllexport) mniejsze_dz()
     *wskaznikOdnosnikaPolecenia += 3 * sizeof(size_t);
 }
 
+void __declspec(dllexport) wierzch_dz()
+{
+    //printf("Wywolano wierzch\n");
+    Ozin* oziny = *wskaznikOzinow;
+    size_t* wartosci = (size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia);
+    
+    Zmienna** wynik = oziny[wartosci[0]].wWZmiennej;
+    Zmienna** z1 = oziny[wartosci[1]].wWZmiennej;
+    Zmienna** z2 = oziny[wartosci[2]].wWZmiennej;
+
+    mpz_t z1_mpz, z2_mpz;
+    mpz_init(z1_mpz);
+    mpz_init(z2_mpz);
+
+    mpz_import(z1_mpz, (*z1)->rozmiar, 1, 1, 0, 0, zawartosc(*z1));
+    mpz_import(z2_mpz, (*z2)->rozmiar, 1, 1, 0, 0, zawartosc(*z2));
+
+    if(mpz_cmp(z1_mpz, z2_mpz) < 0)
+    {
+        ustawZawartoscZmiennej(wynik, (*z2)->rozmiar, zawartosc(*z2));
+        (*wynik)->rod = (*z2)->rod;
+    }
+    else
+    {
+        ustawZawartoscZmiennej(wynik, (*z1)->rozmiar, zawartosc(*z1));
+        (*wynik)->rod = (*z1)->rod;
+    }
+
+    mpz_clear(z1_mpz);
+    mpz_clear(z2_mpz);
+
+    *wskaznikOdnosnikaPolecenia += 3 * sizeof(size_t);
+}
+
+void __declspec(dllexport) spod_dz()
+{
+    //printf("Wywolano spod\n");
+    Ozin* oziny = *wskaznikOzinow;
+    size_t* wartosci = (size_t*)(*wskaznikPocztu + *wskaznikOdnosnikaPolecenia);
+    
+    Zmienna** wynik = oziny[wartosci[0]].wWZmiennej;
+    Zmienna** z1 = oziny[wartosci[1]].wWZmiennej;
+    Zmienna** z2 = oziny[wartosci[2]].wWZmiennej;
+
+    mpz_t z1_mpz, z2_mpz;
+    mpz_init(z1_mpz);
+    mpz_init(z2_mpz);
+
+    mpz_import(z1_mpz, (*z1)->rozmiar, 1, 1, 0, 0, zawartosc(*z1));
+    mpz_import(z2_mpz, (*z2)->rozmiar, 1, 1, 0, 0, zawartosc(*z2));
+
+    if(mpz_cmp(z1_mpz, z2_mpz) > 0)
+    {
+        ustawZawartoscZmiennej(wynik, (*z2)->rozmiar, zawartosc(*z2));
+        (*wynik)->rod = (*z2)->rod;
+    }
+    else
+    {
+        ustawZawartoscZmiennej(wynik, (*z1)->rozmiar, zawartosc(*z1));
+        (*wynik)->rod = (*z1)->rod;
+    }
+
+    mpz_clear(z1_mpz);
+    mpz_clear(z2_mpz);
+
+    *wskaznikOdnosnikaPolecenia += 3 * sizeof(size_t);
+}
+
 void __declspec(dllexport) kropka_dz()
 {
     Ozin* oziny = *wskaznikOzinow;
@@ -908,6 +976,8 @@ __declspec(dllexport) char* nazwyPrzenoszonychPolecen[] = {
     "dziel_dz",
     "reszta_dz",
     "nadaj_dz",
+    "wierzch_dz",
+    "spod_dz",
     "nie_dz",
     "wieksze_dz",
     "mniejsze_dz",
@@ -943,6 +1013,8 @@ __declspec(dllexport) size_t dlugosciWywodowPrzenoszonychPolecen[] = {
     3 * sizeof(size_t), // "dziel_dz",
     3 * sizeof(size_t), // "reszta_dz",
     3 * sizeof(size_t), // "nadaj_dz",
+    3 * sizeof(size_t), // "wierzch_dz",
+    3 * sizeof(size_t), // "spod_dz",
     2 * sizeof(size_t), // "nie_dz",
     3 * sizeof(size_t), // "wieksze_dz",
     3 * sizeof(size_t), // "mniejsze_dz",

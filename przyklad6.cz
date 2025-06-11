@@ -1,0 +1,36 @@
+c = 2;
+w = obszar(a, b)
+{
+    wynik = (a + b) * c;
+};
+wf = w(10, 5);
+cosZeSrodka = wf.wynik;
+$wypisz_prs cosZeSrodka
+
+w = obszar(a, b)
+{
+    zwrot = a + b * c;
+};
+
+wf = w(10, 5);
+$wypisz_prs wf
+
+frek = obszar(wartosc)
+{
+    pusty = "";
+    i = wartosc;
+    poki(i > 0)
+    {
+        t = pusty;
+        pusty = t + "*";
+        i -= 1;
+    }
+    $wypisz_prs pusty
+    jesli(wartosc < 5)
+    {
+        frek(wartosc + 1);
+    }
+    $wypisz_prs pusty
+};
+
+frek(1);

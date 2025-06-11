@@ -3,3 +3,8 @@ jakasTamFunkcja = obszar(cos)
     $wypisz_prs "Wywolano jakas tam funkcje"
     $wypisz_prs cos
 };
+
+wypisz = obszar(zaw)
+{
+    $wypisz_prs zaw
+}

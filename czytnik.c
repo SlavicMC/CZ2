@@ -51,8 +51,8 @@ void (*zwolnijPamiecZMpz)(void *, size_t);
 
 char* slowaKluczowe[] = {"###", "jesli", "poki"};
 char* nazwyPolecenSlowKluczowych[] = {"###", "jesli_klc", "poki_klc"};
-char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+=", "-=", "*=", "/=", "%=", "+", "-", "*", "/", "%", "=", "!", ">", "<", "."}; // działania idą w kolejności malejącej długości (najpierw sprawdzamy najdłuższe)
-char* nazwyPolecenDzialan[] = {"rowne_dz", "rozne_dz", "wieksze_badz_rowne_dz", "mniejsze_badz_rowne_dz", "lub_dz", "i_dz", "ndodaj_dz", "nodejmij_dz", "nmnoz_dz", "ndziel_dz", "nreszta_dz", "dodaj_dz", "odejmij_dz", "mnoz_dz", "dziel_dz", "reszta_dz", "nadaj_dz", "nie_dz", "wieksze_dz", "mniejsze_dz", "kropka_dz"};
+char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+=", "-=", "*=", "/=", "%=", "><", "<>", "+", "-", "*", "/", "%", "=", "!", ">", "<", "."}; // działania idą w kolejności malejącej długości (najpierw sprawdzamy najdłuższe)
+char* nazwyPolecenDzialan[] = {"rowne_dz", "rozne_dz", "wieksze_badz_rowne_dz", "mniejsze_badz_rowne_dz", "lub_dz", "i_dz", "ndodaj_dz", "nodejmij_dz", "nmnoz_dz", "ndziel_dz", "nreszta_dz", "wierzch_dz", "spod_dz", "dodaj_dz", "odejmij_dz", "mnoz_dz", "dziel_dz", "reszta_dz", "nadaj_dz", "nie_dz", "wieksze_dz", "mniejsze_dz", "kropka_dz"};
 
 Polecenie* polecenia = NULL;
 char** nazwyPolecen = NULL;

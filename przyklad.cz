@@ -1,8 +1,22 @@
-c = 2;
-w = obszar(a, b)
+$wezwij_dom "peki.dll"
+$wciel_dom "peki.cz"
+$wciel_dom "wcielany.cz"
+
+$tlumacz_dom
+$czytaj_dom
+###
+
+wynik = zawartosc("przyklad.txt");
+$wypisz_prs wynik
+powodzenie = wpisz("przyklad.txt", "nowa zawartosc");
+jesli(powodzenie)
 {
-    chuj = (a + b) * c;
-};
-wf = w(10, 5);
-cZeSrodka = wf.chuj;
-$wypisz_prs cZeSrodka
+    $wypisz_prs "Wpisywanie powiodlo sie"
+}
+jesli(!powodzenie)
+{
+    $wypisz_prs "Wpisywanie nie powiodlo sie"
+}
+
+wynik = zawartosc("przyklad.txt");
+wypisz(wynik);

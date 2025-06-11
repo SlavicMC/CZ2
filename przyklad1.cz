@@ -2,11 +2,22 @@ x = 5;
 y = 7;
 reszta = "jeszcze mnie nie ustawili";
 $wypisz_prs reszta
+
+wieksza = x >< y;
+mniejsza = x <> y;
+$wypisz_prs wieksza
+$wypisz_prs mniejsza
+
 jesli(12 == x + y || x >= y)
 {
-    x += 1;
-    y -= 1;
+    x += 3;
+    y -= 3;
 }
+
+wieksza = y >< x;
+mniejsza = y <> x;
+$wypisz_prs wieksza
+$wypisz_prs mniejsza
 
 $ustaw_reszte_dom "warunkowa = tak;
 $wypisz_prs warunkowa"

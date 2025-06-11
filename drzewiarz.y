@@ -13,7 +13,7 @@ size_t odnosnikCzastki;
 size_t liczbaCzastek;
 Rozgalezienie* drzewo = NULL;
 
-#define WYKONAJ 101
+//#define WYKONAJ 101
 
 char* polozenie;
 char* pPola;
@@ -32,20 +32,22 @@ char* kPola;
 %token <polecenie> POLECENIE
 %token JESLI POKI
 %token DODAJ ODEJMIJ MNOZ DZIEL RESZTA
+%token WIERZCH SPOD
 %token NADAJ NDODAJ NODEJMIJ NMNOZ NDZIEL NRESZTA
 %token NIE ROWNE ROZNE WIEKSZE MNIEJSZE WIEKSZE_BADZ_ROWNE MNIEJSZE_BADZ_ROWNE
 %token I LUB
 %token SREDNIK PRZECINEK LNAWIAS PNAWIAS LSPIECIE PSPIECIE
 %type <rozgalezienie> wyrazenia dzialania
-%type <galazPodwojna> wyrazenie dzialanie wywolanie
+%type <galazPodwojna> wyrazenie dzialanie
 
 %right NADAJ NDODAJ NODEJMIJ NMNOZ NDZIEL NRESZTA
 %left I LUB
 %left ROWNE ROZNE WIEKSZE MNIEJSZE WIEKSZE_BADZ_ROWNE MNIEJSZE_BADZ_ROWNE
 %left DODAJ ODEJMIJ
 %left MNOZ DZIEL RESZTA
+%left WIERZCH SPOD
 %left NIE
-%left KROPKA
+%left WYKONAJ KROPKA
 
 %start calosc
 
@@ -89,6 +91,8 @@ dzialanie:
     | dzialanie MNOZ dzialanie                  { $$ = utworzDzialanie(MNOZ, $1, $3); }
     | dzialanie DZIEL dzialanie                 { $$ = utworzDzialanie(DZIEL, $1, $3); }
     | dzialanie RESZTA dzialanie                { $$ = utworzDzialanie(RESZTA, $1, $3); }
+    | dzialanie WIERZCH dzialanie               { $$ = utworzDzialanie(WIERZCH, $1, $3); }
+    | dzialanie SPOD dzialanie                  { $$ = utworzDzialanie(SPOD, $1, $3); }
     | NIE dzialanie                             { $$ = utworzDzialanie(NIE, $2, NULL); }
     | dzialanie ROWNE dzialanie                 { $$ = utworzDzialanie(ROWNE, $1, $3); }
     | dzialanie ROZNE dzialanie                 { $$ = utworzDzialanie(ROZNE, $1, $3); }
@@ -96,18 +100,14 @@ dzialanie:
     | dzialanie MNIEJSZE dzialanie              { $$ = utworzDzialanie(MNIEJSZE, $1, $3); }
     | dzialanie WIEKSZE_BADZ_ROWNE dzialanie    { $$ = utworzDzialanie(WIEKSZE_BADZ_ROWNE, $1, $3); }
     | dzialanie MNIEJSZE_BADZ_ROWNE dzialanie   { $$ = utworzDzialanie(MNIEJSZE_BADZ_ROWNE, $1, $3); }
-    | dzialanie I dzialanie                     { $$ = utworzDzialanie(I, $1, $3); }
-    | dzialanie LUB dzialanie                   { $$ = utworzDzialanie(LUB, $1, $3); }
-    | dzialanie KROPKA dzialanie                { $$ = utworzDzialanie(KROPKA, $1, $3); }
-    | wywolanie                                 { $$ = $1; }
-    | LNAWIAS dzialanie PNAWIAS                 { $$ = $2; }
-    | ZMIENNA                                   { $$ = utworzZmiennaJakoGalaz($1); }
+    | dzialanie I dzialanie                                 { $$ = utworzDzialanie(I, $1, $3); }
+    | dzialanie LUB dzialanie                               { $$ = utworzDzialanie(LUB, $1, $3); }
+    | dzialanie KROPKA dzialanie                            { $$ = utworzDzialanie(KROPKA, $1, $3); }
+    | ZMIENNA LNAWIAS dzialania PNAWIAS %prec WYKONAJ     { $$ = utworzDzialanie(WYKONAJ, utworzZmiennaJakoGalaz($1), $3); }
+    | ZMIENNA LNAWIAS PNAWIAS %prec WYKONAJ               { $$ = utworzDzialanie(WYKONAJ, utworzZmiennaJakoGalaz($1), utworzRozgalezienie()); }
+    | LNAWIAS dzialanie PNAWIAS                             { $$ = $2; }
+    | ZMIENNA                                               { $$ = utworzZmiennaJakoGalaz($1); }
     ;
-
-wywolanie:
-      ZMIENNA LNAWIAS dzialania PNAWIAS     { $$ = utworzDzialanie(WYKONAJ, utworzZmiennaJakoGalaz($1), $3); }
-    | ZMIENNA LNAWIAS PNAWIAS               { $$ = utworzDzialanie(WYKONAJ, utworzZmiennaJakoGalaz($1), utworzRozgalezienie()); }
-
 %%
 
 int zmienniana = ZMIENNA;
@@ -115,8 +115,8 @@ int poleceniana = POLECENIE;
 int wykonaniana = WYKONAJ;
 int kluczowe[] = { 0, JESLI, POKI};
 size_t liczbaSlowKluczowych = sizeof(kluczowe)/sizeof(kluczowe[0]);
-// char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+=", "-=", "*=", "/=", "%=", "+", "-", "*", "/", "%", "=", "!", ">", "<", "."};
-int dzialaniowe[] = {ROWNE, ROZNE, WIEKSZE_BADZ_ROWNE, MNIEJSZE_BADZ_ROWNE, LUB, I, NDODAJ, NODEJMIJ, NMNOZ, NDZIEL, NRESZTA, DODAJ, ODEJMIJ, MNOZ, DZIEL, RESZTA, NADAJ, NIE, WIEKSZE, MNIEJSZE, KROPKA};
+// char* dzialania[] = {"==", "!=", ">=", "<=", "||", "&&", "+=", "-=", "*=", "/=", "%=", "><", "<>", "+", "-", "*", "/", "%", "=", "!", ">", "<", "."};
+int dzialaniowe[] = {ROWNE, ROZNE, WIEKSZE_BADZ_ROWNE, MNIEJSZE_BADZ_ROWNE, LUB, I, NDODAJ, NODEJMIJ, NMNOZ, NDZIEL, NRESZTA, WIERZCH, SPOD, DODAJ, ODEJMIJ, MNOZ, DZIEL, RESZTA, NADAJ, NIE, WIEKSZE, MNIEJSZE, KROPKA};
 size_t liczbaDzialan = sizeof(dzialaniowe)/sizeof(dzialaniowe[0]);
 
 GalazPodwojna* utworzZmiennaJakoGalaz(size_t z)
