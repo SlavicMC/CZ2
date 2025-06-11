@@ -7,4 +7,4 @@ jakasTamFunkcja = obszar(cos)
 wypisz = obszar(zaw)
 {
     $wypisz_prs zaw
-}
+};

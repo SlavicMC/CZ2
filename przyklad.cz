@@ -18,5 +18,7 @@ jesli(!powodzenie)
     $wypisz_prs "Wpisywanie nie powiodlo sie"
 }
 
+$wypisz_prs "koniec"
+
 wynik = zawartosc("przyklad.txt");
 wypisz(wynik);
